@@ -6,9 +6,15 @@ import type { WorkoutSession } from "@/types/workout";
 
 type AccountViewProps = {
   accountInitial: string;
+  canManageInvites: boolean;
   email: string;
+  inviteEmail: string;
+  inviteMessage: string | null;
+  isInviting: boolean;
   onOpenWorkout: (workout: WorkoutSession) => void;
   onSignOut: () => void;
+  onInviteEmailChange: (value: string) => void;
+  onInviteSubmit: () => void;
   onThemeChange: (value: "system" | "light" | "dark") => void;
   themeMode: "system" | "light" | "dark";
   workouts: WorkoutSession[];
@@ -127,9 +133,15 @@ function buildMonthDays(
 
 export function AccountView({
   accountInitial,
+  canManageInvites,
   email,
+  inviteEmail,
+  inviteMessage,
+  isInviting,
   onOpenWorkout,
   onSignOut,
+  onInviteEmailChange,
+  onInviteSubmit,
   onThemeChange,
   themeMode,
   workouts,
@@ -181,6 +193,33 @@ export function AccountView({
           </button>
         </div>
       </div>
+
+      {canManageInvites ? (
+        <div className="panel">
+          <div className="panel-header">
+            <h3>Invite Friends</h3>
+          </div>
+          <div className="stack">
+            <input
+              className="text-input"
+              inputMode="email"
+              placeholder="friend@example.com"
+              type="email"
+              value={inviteEmail}
+              onChange={(event) => onInviteEmailChange(event.target.value)}
+            />
+            {inviteMessage ? <div className="exercise-subtext">{inviteMessage}</div> : null}
+            <button
+              className="primary-button"
+              disabled={isInviting}
+              type="button"
+              onClick={onInviteSubmit}
+            >
+              {isInviting ? "Sending invite" : "Send invite"}
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="panel">
         <div className="panel-header">

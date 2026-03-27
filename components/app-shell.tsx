@@ -202,6 +202,9 @@ export function AppShell() {
   const [isEditingSavedSession, setIsEditingSavedSession] = useState(false);
   const [draftTemplate, setDraftTemplate] = useState<WorkoutTemplate | null>(null);
   const [themeMode, setThemeMode] = useState<ThemeMode>("system");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -348,6 +351,40 @@ export function AppShell() {
     setInProgressWorkout(null);
     setSelectedHistoryWorkout(null);
     setIsEditingSavedSession(false);
+  }
+
+  async function handleInviteFriend() {
+    if (!session?.access_token) {
+      return;
+    }
+
+    setIsInviting(true);
+    setInviteMessage(null);
+
+    try {
+      const response = await fetch("/api/invite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ email: inviteEmail }),
+      });
+
+      const data = (await response.json()) as { error?: string; message?: string };
+
+      if (!response.ok) {
+        setInviteMessage(data.error ?? "Failed to send invite.");
+        return;
+      }
+
+      setInviteMessage(data.message ?? "Invite sent.");
+      setInviteEmail("");
+    } catch {
+      setInviteMessage("Failed to send invite.");
+    } finally {
+      setIsInviting(false);
+    }
   }
 
   function openTemplate(template: WorkoutTemplate) {
@@ -544,6 +581,7 @@ export function AppShell() {
         ? selectedHistoryWorkout
         : inProgressWorkout
       : null;
+  const canManageInvites = process.env.NEXT_PUBLIC_ENABLE_INVITES === "true";
 
   if (isLoading) {
     return (
@@ -638,7 +676,13 @@ export function AppShell() {
           {screen.name === "account" ? (
             <AccountView
               accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
+              canManageInvites={canManageInvites}
               email={session.user.email ?? ""}
+              inviteEmail={inviteEmail}
+              inviteMessage={inviteMessage}
+              isInviting={isInviting}
+              onInviteEmailChange={setInviteEmail}
+              onInviteSubmit={() => void handleInviteFriend()}
               onOpenWorkout={openWorkout}
               onSignOut={() => void handleLogout()}
               onThemeChange={setThemeMode}
