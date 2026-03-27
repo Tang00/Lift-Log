@@ -23,6 +23,8 @@ import {
   saveTemplate,
 } from "@/utils/supabase/workout-store";
 
+type ThemeMode = "system" | "light" | "dark";
+
 type Screen =
   | { name: "menu" }
   | { name: "account" }
@@ -199,6 +201,42 @@ export function AppShell() {
     useState<WorkoutSession | null>(null);
   const [isEditingSavedSession, setIsEditingSavedSession] = useState(false);
   const [draftTemplate, setDraftTemplate] = useState<WorkoutTemplate | null>(null);
+  const [themeMode, setThemeMode] = useState<ThemeMode>("system");
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const storedTheme = window.localStorage.getItem("lift-log-theme");
+    if (
+      storedTheme === "system" ||
+      storedTheme === "light" ||
+      storedTheme === "dark"
+    ) {
+      setThemeMode(storedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined" || typeof window === "undefined") {
+      return;
+    }
+
+    const root = document.documentElement;
+    const body = document.body;
+
+    if (themeMode === "system") {
+      root.removeAttribute("data-theme");
+      body.removeAttribute("data-theme");
+      window.localStorage.removeItem("lift-log-theme");
+      return;
+    }
+
+    root.setAttribute("data-theme", themeMode);
+    body.setAttribute("data-theme", themeMode);
+    window.localStorage.setItem("lift-log-theme", themeMode);
+  }, [themeMode]);
 
   useEffect(() => {
     let isMounted = true;
@@ -603,6 +641,8 @@ export function AppShell() {
               email={session.user.email ?? ""}
               onOpenWorkout={openWorkout}
               onSignOut={() => void handleLogout()}
+              onThemeChange={setThemeMode}
+              themeMode={themeMode}
               workouts={workouts}
             />
           ) : null}

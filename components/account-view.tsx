@@ -9,6 +9,8 @@ type AccountViewProps = {
   email: string;
   onOpenWorkout: (workout: WorkoutSession) => void;
   onSignOut: () => void;
+  onThemeChange: (value: "system" | "light" | "dark") => void;
+  themeMode: "system" | "light" | "dark";
   workouts: WorkoutSession[];
 };
 
@@ -128,6 +130,8 @@ export function AccountView({
   email,
   onOpenWorkout,
   onSignOut,
+  onThemeChange,
+  themeMode,
   workouts,
 }: AccountViewProps) {
   const currentMonth = useMemo(() => startOfMonth(new Date()), []);
@@ -152,6 +156,29 @@ export function AccountView({
             <h3>Account</h3>
             <div className="exercise-subtext">{email}</div>
           </div>
+        </div>
+        <div className="theme-toggle" role="group" aria-label="Theme">
+          <button
+            className={`theme-toggle-button ${themeMode === "system" ? "active" : ""}`}
+            type="button"
+            onClick={() => onThemeChange("system")}
+          >
+            System
+          </button>
+          <button
+            className={`theme-toggle-button ${themeMode === "light" ? "active" : ""}`}
+            type="button"
+            onClick={() => onThemeChange("light")}
+          >
+            Light
+          </button>
+          <button
+            className={`theme-toggle-button ${themeMode === "dark" ? "active" : ""}`}
+            type="button"
+            onClick={() => onThemeChange("dark")}
+          >
+            Dark
+          </button>
         </div>
       </div>
 
