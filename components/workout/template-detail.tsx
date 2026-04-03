@@ -115,7 +115,7 @@ export function TemplateDetail({
   }, [dateInputValue]);
 
   return (
-    <div className="stack">
+    <div className={styles.root}>
       <div className={styles.header}>
         <button
           aria-label="Go back"

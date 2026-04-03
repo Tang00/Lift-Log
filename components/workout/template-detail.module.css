@@ -1,3 +1,11 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .header {
   display: grid;
   grid-template-columns: 36px minmax(0, 1fr) auto;
@@ -57,16 +65,19 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0;
   align-items: stretch;
-  min-height: calc(100dvh - 230px);
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .scrollArea {
-  height: calc(100dvh - 230px);
+  min-height: 0;
   overflow-y: auto;
   padding-right: 0;
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .scrollArea::-webkit-scrollbar {
@@ -98,10 +109,5 @@
 
   .scrollLayout {
     gap: 0;
-    min-height: calc(100dvh - 220px);
-  }
-
-  .scrollArea {
-    height: calc(100dvh - 220px);
   }
 }
