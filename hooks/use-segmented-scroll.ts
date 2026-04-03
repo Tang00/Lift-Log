@@ -149,7 +149,7 @@ export function useSegmentedScroll(itemCount: number) {
     [itemCount],
   );
 
-  function scrollToIndex(index: number) {
+  function scrollToIndex(index: number, behavior: ScrollBehavior = "smooth") {
     const root = containerRef.current;
     const item = itemRefs.current[index];
 
@@ -159,7 +159,7 @@ export function useSegmentedScroll(itemCount: number) {
 
     root.scrollTo({
       top: Math.max(getItemTop(root, item), 0),
-      behavior: "smooth",
+      behavior,
     });
   }
 

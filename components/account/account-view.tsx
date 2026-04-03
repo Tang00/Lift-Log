@@ -39,48 +39,50 @@ export function AccountView({
   workouts,
 }: AccountViewProps) {
   return (
-    <div className="stack">
-      <Panel>
-        <div className={styles.summary}>
-          <div className={styles.summaryAvatar}>{accountInitial}</div>
-          <div className={styles.summaryCopy}>
-            <h3>Account</h3>
-            <div className="exercise-subtext">{email}</div>
+    <div className={styles.root}>
+      <div className={styles.stack}>
+        <Panel>
+          <div className={styles.summary}>
+            <div className={styles.summaryAvatar}>{accountInitial}</div>
+            <div className={styles.summaryCopy}>
+              <h3>Account</h3>
+              <div className="exercise-subtext">{email}</div>
+            </div>
           </div>
-        </div>
-        <AccountThemeToggle onThemeChange={onThemeChange} themeMode={themeMode} />
-      </Panel>
-
-      {canManageInvites ? (
-        <Panel title="Invite Friends">
-          <div className="stack">
-            <input
-              className="text-input"
-              inputMode="email"
-              placeholder="friend@example.com"
-              type="email"
-              value={inviteEmail}
-              onChange={(event) => onInviteEmailChange(event.target.value)}
-            />
-            {inviteMessage ? <div className="exercise-subtext">{inviteMessage}</div> : null}
-            <button
-              className="primary-button"
-              disabled={isInviting}
-              type="button"
-              onClick={onInviteSubmit}
-            >
-              {isInviting ? "Sending invite" : "Send invite"}
-            </button>
-          </div>
+          <AccountThemeToggle onThemeChange={onThemeChange} themeMode={themeMode} />
         </Panel>
-      ) : null}
 
-      <AccountCalendar onOpenWorkout={onOpenWorkout} workouts={workouts} />
-      <AccountHistoryList onOpenWorkout={onOpenWorkout} workouts={workouts} />
+        {canManageInvites ? (
+          <Panel title="Invite Friends">
+            <div className="stack">
+              <input
+                className="text-input"
+                inputMode="email"
+                placeholder="friend@example.com"
+                type="email"
+                value={inviteEmail}
+                onChange={(event) => onInviteEmailChange(event.target.value)}
+              />
+              {inviteMessage ? <div className="exercise-subtext">{inviteMessage}</div> : null}
+              <button
+                className="primary-button"
+                disabled={isInviting}
+                type="button"
+                onClick={onInviteSubmit}
+              >
+                {isInviting ? "Sending invite" : "Send invite"}
+              </button>
+            </div>
+          </Panel>
+        ) : null}
 
-      <button className="secondary-button" type="button" onClick={onSignOut}>
-        Sign out
-      </button>
+        <AccountCalendar onOpenWorkout={onOpenWorkout} workouts={workouts} />
+        <AccountHistoryList onOpenWorkout={onOpenWorkout} workouts={workouts} />
+
+        <button className="secondary-button" type="button" onClick={onSignOut}>
+          Sign out
+        </button>
+      </div>
     </div>
   );
 }

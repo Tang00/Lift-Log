@@ -254,6 +254,7 @@ export function TemplateEditor({
           count={draft.exercises.length}
           isVisible={isScrollActive}
           labels={draft.exercises.map((exercise) => exercise.name || "Exercise")}
+          onScrub={(index) => scrollToIndex(index, "auto")}
           onSelect={scrollToIndex}
         />
       </div>

@@ -9,6 +9,7 @@ type SegmentedScrollNavProps = {
   count: number;
   isVisible?: boolean;
   labels?: string[];
+  onScrub: (index: number) => void;
   onSelect: (index: number) => void;
 };
 
@@ -17,27 +18,43 @@ export function SegmentedScrollNav({
   count,
   isVisible = false,
   labels,
+  onScrub,
   onSelect,
 }: SegmentedScrollNavProps) {
   const railRef = useRef<HTMLElement | null>(null);
   const [activePointerId, setActivePointerId] = useState<number | null>(null);
+  const lastScrubbedIndexRef = useRef<number | null>(null);
   const [isInteracting, setIsInteracting] = useState(false);
 
-  function selectFromClientY(clientY: number) {
+  function releasePointer(pointerId: number) {
+    const rail = railRef.current;
+
+    if (!rail) {
+      return;
+    }
+
+    try {
+      if (rail.hasPointerCapture(pointerId)) {
+        rail.releasePointerCapture(pointerId);
+      }
+    } catch {
+      // Mobile browsers can already drop capture before this handler runs.
+    }
+  }
+
+  function getIndexFromClientY(clientY: number) {
     const rail = railRef.current;
 
     if (!rail || count <= 0) {
-      return;
+      return null;
     }
 
     const rect = rail.getBoundingClientRect();
     const relativeY = Math.min(Math.max(clientY - rect.top, 0), rect.height);
-    const nextIndex = Math.min(
+    return Math.min(
       count - 1,
       Math.max(0, Math.floor((relativeY / Math.max(rect.height, 1)) * count)),
     );
-
-    onSelect(nextIndex);
   }
 
   return (
@@ -53,27 +70,40 @@ export function SegmentedScrollNav({
         setIsInteracting(true);
         setActivePointerId(event.pointerId);
         railRef.current?.setPointerCapture(event.pointerId);
-        selectFromClientY(event.clientY);
+        const nextIndex = getIndexFromClientY(event.clientY);
+        if (nextIndex == null) {
+          return;
+        }
+        lastScrubbedIndexRef.current = nextIndex;
+        onScrub(nextIndex);
       }}
       onPointerMove={(event) => {
         if (activePointerId !== event.pointerId) {
           return;
         }
 
-        selectFromClientY(event.clientY);
+        const nextIndex = getIndexFromClientY(event.clientY);
+        if (nextIndex == null || nextIndex === lastScrubbedIndexRef.current) {
+          return;
+        }
+
+        lastScrubbedIndexRef.current = nextIndex;
+        onScrub(nextIndex);
       }}
       onPointerUp={(event) => {
         if (activePointerId === event.pointerId) {
-          railRef.current?.releasePointerCapture(event.pointerId);
+          releasePointer(event.pointerId);
           setActivePointerId(null);
         }
+        lastScrubbedIndexRef.current = null;
         setIsInteracting(false);
       }}
       onPointerCancel={(event) => {
         if (activePointerId === event.pointerId) {
-          railRef.current?.releasePointerCapture(event.pointerId);
+          releasePointer(event.pointerId);
           setActivePointerId(null);
         }
+        lastScrubbedIndexRef.current = null;
         setIsInteracting(false);
       }}
     >
