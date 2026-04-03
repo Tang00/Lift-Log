@@ -11,6 +11,7 @@ import {
   saveCompletedWorkout,
   saveTemplate,
 } from "@/utils/supabase/workout-store";
+import { MAX_TEMPLATES } from "@/utils/workout/limits";
 import { createTemplateFromSession, normalizeTemplate } from "@/utils/workout/session";
 
 type UseWorkoutDataOptions = {
@@ -83,6 +84,12 @@ export function useWorkoutData({ onError, session }: UseWorkoutDataOptions) {
     setIsSavingTemplate(true);
     try {
       const normalized = normalizeTemplate(template);
+      const isNewTemplate = !templates.some((existingTemplate) => existingTemplate.id === normalized.id);
+
+      if (isNewTemplate && templates.length >= MAX_TEMPLATES) {
+        throw new Error(`You can only save up to ${MAX_TEMPLATES} templates.`);
+      }
+
       await saveTemplate(session.user.id, normalized);
       const nextTemplates = await fetchTemplates();
       setTemplates(nextTemplates);

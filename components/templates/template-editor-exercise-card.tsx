@@ -3,8 +3,10 @@
 import styles from "@/components/templates/template-editor.module.css";
 import cardStyles from "@/components/templates/template-card.module.css";
 import type { TemplateExercise } from "@/types/workout";
+import { clampIntegerString, MAX_REPS } from "@/utils/workout/limits";
 
 type TemplateEditorExerciseCardProps = {
+  canAddSet: boolean;
   exercise: TemplateExercise;
   index: number;
   onAddSet: () => void;
@@ -20,6 +22,7 @@ type TemplateEditorExerciseCardProps = {
 };
 
 export function TemplateEditorExerciseCard({
+  canAddSet,
   exercise,
   index,
   onAddSet,
@@ -31,7 +34,7 @@ export function TemplateEditorExerciseCard({
 }: TemplateEditorExerciseCardProps) {
   function sanitizeIntegerInput(value: string) {
     if (value === "" || /^\d+$/.test(value)) {
-      return value;
+      return clampIntegerString(value, MAX_REPS);
     }
 
     return null;
@@ -80,11 +83,12 @@ export function TemplateEditorExerciseCard({
                 <label className={styles.repTargetField}>
                   <span className={styles.repTargetCaption}>Min</span>
                   <input
-                    className="text-input"
-                    type="text"
-                    value={target.minReps}
-                    inputMode="numeric"
-                    onChange={(event) => {
+                  className="text-input"
+                  type="text"
+                  value={target.minReps}
+                  inputMode="numeric"
+                  maxLength={2}
+                  onChange={(event) => {
                       const nextValue = sanitizeIntegerInput(event.target.value);
                       if (nextValue !== null) {
                         onRepTargetChange(setIndex, "minReps", nextValue);
@@ -95,11 +99,12 @@ export function TemplateEditorExerciseCard({
                 <label className={styles.repTargetField}>
                   <span className={styles.repTargetCaption}>Max</span>
                   <input
-                    className="text-input"
-                    type="text"
-                    value={target.maxReps}
-                    inputMode="numeric"
-                    onChange={(event) => {
+                  className="text-input"
+                  type="text"
+                  value={target.maxReps}
+                  inputMode="numeric"
+                  maxLength={2}
+                  onChange={(event) => {
                       const nextValue = sanitizeIntegerInput(event.target.value);
                       if (nextValue !== null) {
                         onRepTargetChange(setIndex, "maxReps", nextValue);
@@ -119,7 +124,12 @@ export function TemplateEditorExerciseCard({
             ))}
           </div>
           <div className={styles.repTargetActions}>
-            <button className={cardStyles.editButton} type="button" onClick={onAddSet}>
+            <button
+              className={cardStyles.editButton}
+              disabled={!canAddSet}
+              type="button"
+              onClick={onAddSet}
+            >
               Add set
             </button>
           </div>

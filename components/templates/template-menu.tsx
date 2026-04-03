@@ -5,6 +5,7 @@ import { TemplateCard } from "@/components/templates/template-card";
 import cardStyles from "@/components/templates/template-card.module.css";
 import { Panel } from "@/components/ui/panel";
 import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
+import { MAX_TEMPLATES } from "@/utils/workout/limits";
 
 type TemplateMenuProps = {
   inProgressWorkout: WorkoutSession | null;
@@ -25,6 +26,8 @@ export function TemplateMenu({
   onSelectTemplate,
   templates,
 }: TemplateMenuProps) {
+  const hasReachedTemplateLimit = templates.length >= MAX_TEMPLATES;
+
   return (
     <div className="stack">
       <Panel title="Start a workout">
@@ -47,6 +50,7 @@ export function TemplateMenu({
           <button
             aria-label="Create template"
             className={cardStyles.iconButton}
+            disabled={hasReachedTemplateLimit}
             type="button"
             onClick={onCreateTemplate}
           >

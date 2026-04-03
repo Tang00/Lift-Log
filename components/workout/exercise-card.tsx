@@ -6,6 +6,7 @@ import cardStyles from "@/components/templates/template-card.module.css";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import styles from "@/components/workout/exercise-card.module.css";
 import type { WorkoutExerciseEntry, WorkoutSetEntry } from "@/types/workout";
+import { clampDecimalString, clampIntegerString, MAX_REPS, MAX_SETS, MAX_WEIGHT } from "@/utils/workout/limits";
 
 type ExerciseCardProps = {
   exercise: WorkoutExerciseEntry;
@@ -43,6 +44,14 @@ export function ExerciseCard({
 
     if (/^\d*\.?\d*$/.test(value)) {
       return value;
+    }
+
+    return null;
+  }
+
+  function sanitizeIntegerInput(value: string) {
+    if (value === "" || /^\d+$/.test(value)) {
+      return clampIntegerString(value, MAX_REPS);
     }
 
     return null;
@@ -147,7 +156,7 @@ export function ExerciseCard({
               onChange={(event) => {
                 const nextValue = sanitizeNumericInput(event.target.value);
                 if (nextValue !== null) {
-                  onUpdateSet(index, "weight", nextValue);
+                  onUpdateSet(index, "weight", clampDecimalString(nextValue, MAX_WEIGHT));
                 }
               }}
               onFocus={() =>
@@ -168,10 +177,11 @@ export function ExerciseCard({
               disabled={readOnly}
               readOnly={readOnly}
               type="text"
-              inputMode="decimal"
+              inputMode="numeric"
+              maxLength={2}
               value={set.reps}
               onChange={(event) => {
-                const nextValue = sanitizeNumericInput(event.target.value);
+                const nextValue = sanitizeIntegerInput(event.target.value);
                 if (nextValue !== null) {
                   onUpdateSet(index, "reps", nextValue);
                 }
@@ -206,7 +216,12 @@ export function ExerciseCard({
 
       {!readOnly ? (
         <div className={styles.footerControls}>
-          <button className={cardStyles.editButton} type="button" onClick={onAddSet}>
+          <button
+            className={cardStyles.editButton}
+            disabled={exercise.sets.length >= MAX_SETS}
+            type="button"
+            onClick={onAddSet}
+          >
             Add set
           </button>
           <button

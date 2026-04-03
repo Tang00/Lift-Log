@@ -10,6 +10,7 @@ import { DeleteWorkoutModal } from "@/components/workout/delete-workout-modal";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { TemplateDetailDateModal } from "@/components/workout/template-detail-date-modal";
 import type { WorkoutSession, WorkoutSetEntry } from "@/types/workout";
+import { MAX_EXERCISES } from "@/utils/workout/limits";
 
 type TemplateDetailProps = {
   onAddExercise: () => void;
@@ -171,7 +172,12 @@ export function TemplateDetail({
           </div>
           {!isSavedSession || isEditingSavedSession ? (
             <div className={`${styles.actionStack} ${styles.scrollFooter}`} ref={trailingRef}>
-              <button className="secondary-button" type="button" onClick={onAddExercise}>
+              <button
+                className="secondary-button"
+                disabled={session.exercises.length >= MAX_EXERCISES}
+                type="button"
+                onClick={onAddExercise}
+              >
                 Add exercise
               </button>
               <button

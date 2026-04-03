@@ -5,6 +5,7 @@ import type {
   WorkoutSetEntry,
   WorkoutTemplate,
 } from "@/types/workout";
+import { MAX_EXERCISES, MAX_REPS, MAX_SETS, MAX_WEIGHT } from "@/utils/workout/limits";
 
 export function createEmptyTemplate(): WorkoutTemplate {
   return {
@@ -27,24 +28,32 @@ export function createEmptyTemplate(): WorkoutTemplate {
 export function normalizeTemplate(template: WorkoutTemplate): WorkoutTemplate {
   return {
     ...template,
-    exercises: template.exercises.map((exercise) => {
+    exercises: template.exercises.slice(0, MAX_EXERCISES).map((exercise) => {
+      const expectedSets = Math.min(Math.max(1, exercise.expectedSets), MAX_SETS);
       const fallbackTarget =
         exercise.repTargets && exercise.repTargets.length > 0
-          ? exercise.repTargets
-          : Array.from({ length: Math.max(1, exercise.expectedSets) }, () => ({
+          ? exercise.repTargets.slice(0, MAX_SETS)
+          : Array.from({ length: expectedSets }, () => ({
               minReps: "",
               maxReps: "",
             }));
 
       const repTargets = Array.from(
-        { length: Math.max(1, exercise.expectedSets) },
-        (_, index) => fallbackTarget[index] ?? fallbackTarget[fallbackTarget.length - 1],
+        { length: expectedSets },
+        (_, index) => {
+          const target = fallbackTarget[index] ?? fallbackTarget[fallbackTarget.length - 1];
+          return {
+            minReps: target?.minReps ? String(Math.min(Number.parseInt(target.minReps, 10) || 0, MAX_REPS)) : "",
+            maxReps: target?.maxReps ? String(Math.min(Number.parseInt(target.maxReps, 10) || 0, MAX_REPS)) : "",
+          };
+        },
       );
 
       return {
         ...exercise,
         id: exercise.id || crypto.randomUUID(),
         note: exercise.note ?? "",
+        expectedSets,
         repTargets,
       };
     }),
@@ -83,7 +92,7 @@ export function createSessionFromTemplate(
         sets: Array.from({ length: exercise.expectedSets }, (_, index) => {
           const defaultWeight =
             previousExercise?.sets[index]?.weight?.trim() !== ""
-              ? previousExercise?.sets[index]?.weight ?? "0"
+              ? String(Math.min(Number.parseFloat(previousExercise?.sets[index]?.weight ?? "0") || 0, MAX_WEIGHT))
               : "0";
           const defaultReps =
             exercise.repTargets[index]?.minReps ||
@@ -147,7 +156,7 @@ export function createSessionSetFromExercise(
   return createWorkoutSetEntry({
     defaultReps:
       lastSet?.minReps || lastSet?.maxReps || lastSet?.defaultReps || "0",
-    defaultWeight: lastSet?.defaultWeight ?? "0",
+    defaultWeight: String(Math.min(Number.parseFloat(lastSet?.defaultWeight ?? "0") || 0, MAX_WEIGHT)),
     maxReps: lastSet?.maxReps ?? "",
     minReps: lastSet?.minReps ?? "",
   });
@@ -206,16 +215,16 @@ export function createTemplateFromSession(
       id: exercise.templateExerciseId ?? crypto.randomUUID(),
       name: exercise.name,
       note: exercise.templateNote,
-      expectedSets: Math.max(1, exercise.sets.length),
+      expectedSets: Math.min(Math.max(1, exercise.sets.length), MAX_SETS),
       previousResults:
         (exercise.templateExerciseId
           ? previousResultsById.get(exercise.templateExerciseId)
           : []) ?? [],
-      repTargets: exercise.sets.map((set) => ({
+      repTargets: exercise.sets.slice(0, MAX_SETS).map((set) => ({
         maxReps: set.maxReps,
         minReps: set.minReps,
       })),
-    })),
+    })).slice(0, MAX_EXERCISES),
   });
 }
 

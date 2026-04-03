@@ -5,6 +5,14 @@ import {
   createSessionSetFromExercise,
   updateSetWithDefaults,
 } from "@/utils/workout/session";
+import {
+  clampDecimalString,
+  clampIntegerString,
+  MAX_EXERCISES,
+  MAX_REPS,
+  MAX_SETS,
+  MAX_WEIGHT,
+} from "@/utils/workout/limits";
 import type { WorkoutTemplate } from "@/types/workout";
 
 export function startWorkoutFromTemplate(
@@ -43,6 +51,10 @@ export function updateWorkoutSet(
       }
 
       if ((field === "weight" || field === "reps") && typeof value === "string") {
+        const boundedValue =
+          field === "weight"
+            ? clampDecimalString(value, MAX_WEIGHT)
+            : clampIntegerString(value, MAX_REPS);
         const defaultField = field === "weight" ? "defaultWeight" : "defaultReps";
         const touchedField = field === "weight" ? "weightTouched" : "repsTouched";
 
@@ -50,10 +62,10 @@ export function updateWorkoutSet(
           ...exercise,
           sets: exercise.sets.map((set, currentSetIndex) => {
             if (currentSetIndex === setIndex) {
-              const nextSet = updateSetWithDefaults(set, field, value);
+              const nextSet = updateSetWithDefaults(set, field, boundedValue);
               return {
                 ...nextSet,
-                [defaultField]: value === "" ? nextSet[defaultField] : value,
+                [defaultField]: boundedValue === "" ? nextSet[defaultField] : boundedValue,
               };
             }
 
@@ -73,8 +85,8 @@ export function updateWorkoutSet(
 
             return {
               ...set,
-              [defaultField]: value === "" ? currentDefault : value,
-              [field]: currentValue === "" ? "" : value,
+              [defaultField]: boundedValue === "" ? currentDefault : boundedValue,
+              [field]: currentValue === "" ? "" : boundedValue,
               [touchedField]: false,
             };
           }),
@@ -127,6 +139,10 @@ export function updateWorkoutCompletedAt(workout: WorkoutSession, value: string)
 }
 
 export function addWorkoutExercise(workout: WorkoutSession) {
+  if (workout.exercises.length >= MAX_EXERCISES) {
+    return workout;
+  }
+
   return {
     ...workout,
     exercises: [
@@ -157,7 +173,9 @@ export function addWorkoutSet(workout: WorkoutSession, exerciseIndex: number) {
     ...workout,
     exercises: workout.exercises.map((exercise, currentExerciseIndex) =>
       currentExerciseIndex === exerciseIndex
-        ? { ...exercise, sets: [...exercise.sets, createSessionSetFromExercise(exercise)] }
+        ? exercise.sets.length >= MAX_SETS
+          ? exercise
+          : { ...exercise, sets: [...exercise.sets, createSessionSetFromExercise(exercise)] }
         : exercise,
     ),
   };

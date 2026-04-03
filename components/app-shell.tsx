@@ -15,6 +15,7 @@ import { useAuthSession } from "@/hooks/use-auth-session";
 import { useThemeMode } from "@/hooks/use-theme-mode";
 import { useWorkoutData } from "@/hooks/use-workout-data";
 import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
+import { MAX_TEMPLATES } from "@/utils/workout/limits";
 import { createEmptyTemplate, normalizeTemplate, sessionDiffersFromTemplate } from "@/utils/workout/session";
 
 type Screen =
@@ -142,6 +143,11 @@ export function AppShell() {
   }
 
   function openTemplateEditor(mode: "create" | "edit", template?: WorkoutTemplate) {
+    if (mode === "create" && templates.length >= MAX_TEMPLATES) {
+      setAuthMessage(`You can only create up to ${MAX_TEMPLATES} templates.`);
+      return;
+    }
+
     const nextTemplate = template
       ? structuredClone(normalizeTemplate(template))
       : createEmptyTemplate();

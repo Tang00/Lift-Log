@@ -7,6 +7,7 @@ import { useSegmentedScroll } from "@/hooks/use-segmented-scroll";
 import styles from "@/components/templates/template-editor.module.css";
 import { TemplateEditorExerciseCard } from "@/components/templates/template-editor-exercise-card";
 import type { TemplateExercise, WorkoutTemplate } from "@/types/workout";
+import { clampIntegerString, MAX_EXERCISES, MAX_REPS, MAX_SETS } from "@/utils/workout/limits";
 
 type TemplateEditorProps = {
   mode: "create" | "edit";
@@ -63,6 +64,10 @@ export function TemplateEditor({
   }
 
   function addExercise() {
+    if (draft.exercises.length >= MAX_EXERCISES) {
+      return;
+    }
+
     setDraft((current) => ({
       ...current,
       exercises: [
@@ -83,7 +88,7 @@ export function TemplateEditor({
     setDraft((current) => ({
       ...current,
       exercises: current.exercises.map((exercise) => {
-        if (exercise.id !== exerciseId) {
+        if (exercise.id !== exerciseId || exercise.repTargets.length >= MAX_SETS) {
           return exercise;
         }
 
@@ -139,7 +144,9 @@ export function TemplateEditor({
           ? {
               ...exercise,
               repTargets: exercise.repTargets.map((target, currentIndex) =>
-                currentIndex === setIndex ? { ...target, [field]: value } : target,
+                currentIndex === setIndex
+                  ? { ...target, [field]: clampIntegerString(value, MAX_REPS) }
+                  : target,
               ),
             }
           : exercise,
@@ -208,6 +215,7 @@ export function TemplateEditor({
             {draft.exercises.map((exercise, index) => (
               <div className={styles.scrollSnapItem} key={exercise.id} ref={setItemRef[index]}>
                 <TemplateEditorExerciseCard
+                  canAddSet={exercise.repTargets.length < MAX_SETS}
                   exercise={exercise}
                   index={index}
                   onAddSet={() => addSet(exercise.id)}
@@ -223,7 +231,12 @@ export function TemplateEditor({
             ))}
           </div>
           <div className={`${styles.editorActions} ${styles.scrollFooter}`} ref={trailingRef}>
-            <button className="secondary-button" type="button" onClick={addExercise}>
+            <button
+              className="secondary-button"
+              disabled={draft.exercises.length >= MAX_EXERCISES}
+              type="button"
+              onClick={addExercise}
+            >
               Add exercise
             </button>
 
