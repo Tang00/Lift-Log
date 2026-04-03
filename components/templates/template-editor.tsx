@@ -73,19 +73,15 @@ export function TemplateEditor({
           id: crypto.randomUUID(),
           name: "",
           note: "",
-          expectedSets: 3,
-          repTargets: [
-            { minReps: "8", maxReps: "" },
-            { minReps: "8", maxReps: "" },
-            { minReps: "8", maxReps: "" },
-          ],
+          expectedSets: 1,
+          repTargets: [{ minReps: "8", maxReps: "" }],
           previousResults: [],
         },
       ],
     }));
   }
 
-  function updateSetCount(exerciseId: string, nextCount: number) {
+  function addSet(exerciseId: string) {
     setDraft((current) => ({
       ...current,
       exercises: current.exercises.map((exercise) => {
@@ -93,24 +89,39 @@ export function TemplateEditor({
           return exercise;
         }
 
-        const safeCount = Math.max(1, nextCount);
-        const nextTargets =
-          safeCount > exercise.repTargets.length
-            ? [
-                ...exercise.repTargets,
-                ...Array.from(
-                  { length: safeCount - exercise.repTargets.length },
-                  () => ({
-                    minReps: exercise.repTargets[exercise.repTargets.length - 1]?.minReps ?? "",
-                    maxReps: exercise.repTargets[exercise.repTargets.length - 1]?.maxReps ?? "",
-                  }),
-                ),
-              ]
-            : exercise.repTargets.slice(0, safeCount);
+        const lastTarget = exercise.repTargets[exercise.repTargets.length - 1];
+        const nextTargets = [
+          ...exercise.repTargets,
+          {
+            minReps: lastTarget?.minReps ?? "",
+            maxReps: lastTarget?.maxReps ?? "",
+          },
+        ];
 
         return {
           ...exercise,
-          expectedSets: safeCount,
+          expectedSets: nextTargets.length,
+          repTargets: nextTargets,
+        };
+      }),
+    }));
+  }
+
+  function removeSet(exerciseId: string, setIndex: number) {
+    setDraft((current) => ({
+      ...current,
+      exercises: current.exercises.map((exercise) => {
+        if (exercise.id !== exerciseId || exercise.repTargets.length <= 1) {
+          return exercise;
+        }
+
+        const nextTargets = exercise.repTargets.filter(
+          (_target, currentIndex) => currentIndex !== setIndex,
+        );
+
+        return {
+          ...exercise,
+          expectedSets: nextTargets.length,
           repTargets: nextTargets,
         };
       }),
@@ -196,16 +207,17 @@ export function TemplateEditor({
             key={exercise.id}
             exercise={exercise}
             index={index}
+            onAddSet={() => addSet(exercise.id)}
             onNameChange={(value) => updateExercise(exercise.id, "name", value)}
             onNoteChange={(value) => updateExercise(exercise.id, "note", value)}
             onRemove={() => removeExercise(exercise.id)}
+            onRemoveSet={(setIndex) => removeSet(exercise.id, setIndex)}
             onRepTargetChange={(setIndex, field, value) =>
               updateRepTarget(exercise.id, setIndex, field, value)
             }
             onRepTargetFocus={(setIndex, field, value) =>
               clearRepTargetDefault(exercise.id, setIndex, field, value)
             }
-            onSetCountChange={(value) => updateSetCount(exercise.id, value)}
           />
         ))}
       </div>

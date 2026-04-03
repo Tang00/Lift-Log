@@ -47,7 +47,7 @@
 
 .repTargetRow {
   display: grid;
-  grid-template-columns: 64px 1fr 1fr;
+  grid-template-columns: 64px 1fr 1fr auto;
   gap: 8px;
   align-items: end;
 }

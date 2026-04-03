@@ -7,9 +7,11 @@ import type { TemplateExercise } from "@/types/workout";
 type TemplateEditorExerciseCardProps = {
   exercise: TemplateExercise;
   index: number;
+  onAddSet: () => void;
   onNameChange: (value: string) => void;
   onNoteChange: (value: string) => void;
   onRemove: () => void;
+  onRemoveSet: (setIndex: number) => void;
   onRepTargetChange: (
     setIndex: number,
     field: "minReps" | "maxReps",
@@ -20,19 +22,27 @@ type TemplateEditorExerciseCardProps = {
     field: "minReps" | "maxReps",
     value: string,
   ) => void;
-  onSetCountChange: (value: number) => void;
 };
 
 export function TemplateEditorExerciseCard({
   exercise,
   index,
+  onAddSet,
   onNameChange,
   onNoteChange,
   onRemove,
+  onRemoveSet,
   onRepTargetChange,
   onRepTargetFocus,
-  onSetCountChange,
 }: TemplateEditorExerciseCardProps) {
+  function sanitizeIntegerInput(value: string) {
+    if (value === "" || /^\d+$/.test(value)) {
+      return value;
+    }
+
+    return null;
+  }
+
   return (
     <div className={`panel ${styles.panel}`}>
       <div className="panel-header">
@@ -65,19 +75,13 @@ export function TemplateEditorExerciseCard({
           />
         </label>
 
-        <label className={styles.field}>
-          <span className="field-label">Expected sets</span>
-          <input
-            className="text-input"
-            min="1"
-            type="number"
-            value={exercise.expectedSets}
-            onChange={(event) => onSetCountChange(Number(event.target.value || 1))}
-          />
-        </label>
-
         <div className={`${styles.field} ${styles.fieldFull}`}>
-          <span className="field-label">Rep targets by set</span>
+          <div className="panel-header">
+            <span className="field-label">Rep targets by set</span>
+            <button className={cardStyles.editButton} type="button" onClick={onAddSet}>
+              Add set
+            </button>
+          </div>
           <div className={styles.repTargetList}>
             {exercise.repTargets.map((target, setIndex) => (
               <div className={styles.repTargetRow} key={`${exercise.id}-${setIndex + 1}`}>
@@ -88,9 +92,13 @@ export function TemplateEditorExerciseCard({
                     className="text-input"
                     type="text"
                     value={target.minReps}
-                    onChange={(event) =>
-                      onRepTargetChange(setIndex, "minReps", event.target.value)
-                    }
+                    inputMode="numeric"
+                    onChange={(event) => {
+                      const nextValue = sanitizeIntegerInput(event.target.value);
+                      if (nextValue !== null) {
+                        onRepTargetChange(setIndex, "minReps", nextValue);
+                      }
+                    }}
                     onFocus={() => onRepTargetFocus(setIndex, "minReps", target.minReps)}
                     placeholder="8"
                   />
@@ -101,13 +109,25 @@ export function TemplateEditorExerciseCard({
                     className="text-input"
                     type="text"
                     value={target.maxReps}
-                    onChange={(event) =>
-                      onRepTargetChange(setIndex, "maxReps", event.target.value)
-                    }
+                    inputMode="numeric"
+                    onChange={(event) => {
+                      const nextValue = sanitizeIntegerInput(event.target.value);
+                      if (nextValue !== null) {
+                        onRepTargetChange(setIndex, "maxReps", nextValue);
+                      }
+                    }}
                     onFocus={() => onRepTargetFocus(setIndex, "maxReps", target.maxReps)}
                     placeholder=""
                   />
                 </label>
+                <button
+                  className={cardStyles.removeButton}
+                  disabled={exercise.repTargets.length <= 1}
+                  type="button"
+                  onClick={() => onRemoveSet(setIndex)}
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>
