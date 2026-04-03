@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { Session } from "@supabase/supabase-js";
+import { useState } from "react";
 
 import { AccountView } from "@/components/account/account-view";
 import { AuthScreen } from "@/components/auth/auth-screen";
@@ -11,30 +10,12 @@ import { TemplateMenu } from "@/components/templates/template-menu";
 import { LoadingModal } from "@/components/ui/loading-modal";
 import { TemplateDetail } from "@/components/workout/template-detail";
 import { UpdateTemplateModal } from "@/components/workout/update-template-modal";
+import { useActiveWorkout } from "@/hooks/use-active-workout";
+import { useAuthSession } from "@/hooks/use-auth-session";
 import { useThemeMode } from "@/hooks/use-theme-mode";
-import type {
-  WorkoutSession,
-  WorkoutSetEntry,
-  WorkoutTemplate,
-} from "@/types/workout";
-import { supabase } from "@/utils/supabase/client";
-import {
-  deleteCompletedWorkout,
-  fetchCompletedWorkouts,
-  fetchTemplates,
-  saveCompletedWorkout,
-  saveTemplate,
-} from "@/utils/supabase/workout-store";
-import {
-  createSessionExercise,
-  createSessionSetFromExercise,
-  createTemplateFromSession,
-  createEmptyTemplate,
-  createSessionFromTemplate,
-  normalizeTemplate,
-  sessionDiffersFromTemplate,
-  updateSetWithDefaults,
-} from "@/utils/workout/session";
+import { useWorkoutData } from "@/hooks/use-workout-data";
+import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
+import { createEmptyTemplate, normalizeTemplate, sessionDiffersFromTemplate } from "@/utils/workout/session";
 
 type Screen =
   | { name: "menu" }
@@ -50,21 +31,18 @@ function screenFromReturnTarget(target: "menu" | "account"): Extract<
 }
 
 export function AppShell() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingData, setIsLoadingData] = useState(false);
-  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
-  const [isSavingWorkout, setIsSavingWorkout] = useState(false);
-  const [isSendingLink, setIsSendingLink] = useState(false);
-  const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const {
+    authMessage,
+    email,
+    isLoading,
+    isSendingLink,
+    session,
+    setAuthMessage,
+    setEmail,
+    signInWithMagicLink,
+    signOut,
+  } = useAuthSession();
   const [screen, setScreen] = useState<Screen>({ name: "menu" });
-  const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
-  const [workouts, setWorkouts] = useState<WorkoutSession[]>([]);
-  const [inProgressWorkout, setInProgressWorkout] = useState<WorkoutSession | null>(null);
-  const [selectedHistoryWorkout, setSelectedHistoryWorkout] =
-    useState<WorkoutSession | null>(null);
-  const [isEditingSavedSession, setIsEditingSavedSession] = useState(false);
   const [draftTemplate, setDraftTemplate] = useState<WorkoutTemplate | null>(null);
   const [pendingTemplateUpdate, setPendingTemplateUpdate] = useState<{
     template: WorkoutTemplate;
@@ -74,123 +52,58 @@ export function AppShell() {
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
   const [isInviting, setIsInviting] = useState(false);
   const { themeMode, setThemeMode } = useThemeMode();
-
-  useEffect(() => {
-    let isMounted = true;
-
-    void supabase.auth.getSession().then(({ data, error }) => {
-      if (!isMounted) {
-        return;
-      }
-
-      if (error) {
-        setAuthMessage(error.message);
-      } else {
-        setSession(data.session);
-      }
-
-      setIsLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setIsLoading(false);
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!session) {
-      setTemplates([]);
-      setWorkouts([]);
-      setInProgressWorkout(null);
-      setSelectedHistoryWorkout(null);
-      setIsEditingSavedSession(false);
-      setPendingTemplateUpdate(null);
-      return;
-    }
-
-    let isMounted = true;
-    setIsLoadingData(true);
-
-    void Promise.all([fetchTemplates(), fetchCompletedWorkouts()])
-      .then(([nextTemplates, nextWorkouts]) => {
-        if (!isMounted) {
-          return;
-        }
-
-        setTemplates(nextTemplates);
-        setWorkouts(nextWorkouts);
-      })
-      .catch((error: unknown) => {
-        if (!isMounted) {
-          return;
-        }
-
-        setAuthMessage(
-          error instanceof Error ? error.message : "Failed to load workout data.",
-        );
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoadingData(false);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [session]);
-
-  async function handleMagicLinkSignIn() {
-    setIsSendingLink(true);
-    setAuthMessage(null);
-
-    const redirectTo =
-      typeof window !== "undefined"
-        ? window.location.hostname === "localhost"
-          ? "http://localhost:3000"
-          : process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
-        : process.env.NEXT_PUBLIC_SITE_URL;
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: redirectTo,
-      },
-    });
-
-    if (error) {
-      setAuthMessage(error.message);
-    } else {
-      setAuthMessage(`Magic link sent to ${email}`);
-    }
-
-    setIsSendingLink(false);
-  }
+  const {
+    deleteWorkoutRecord,
+    isLoadingData,
+    isSavingTemplate,
+    isSavingWorkout,
+    persistWorkoutRecord,
+    saveTemplateRecord,
+    templates,
+    workouts,
+  } = useWorkoutData({
+    onError: setAuthMessage,
+    session,
+  });
+  const detailSource = screen.name === "detail" ? screen.returnTo : null;
+  const {
+    activeWorkout,
+    addExercise,
+    addSet,
+    clearAllWorkoutState,
+    clearHistoryWorkout,
+    clearInProgressWorkout,
+    inProgressWorkout,
+    isEditingSavedSession,
+    openTemplate,
+    openWorkout,
+    removeExercise,
+    removeSet,
+    setIsEditingSavedSession,
+    updateCompletedAt,
+    updateExerciseName,
+    updateNote,
+    updateSet,
+  } = useActiveWorkout({
+    completedWorkouts: workouts,
+    source: detailSource,
+  });
+  const canManageInvites = process.env.NEXT_PUBLIC_ENABLE_INVITES === "true";
+  const currentDraft =
+    screen.name === "editor" && draftTemplate ? draftTemplate : null;
 
   async function handleLogout() {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      setAuthMessage(error.message);
+    const didSignOut = await signOut();
+    if (!didSignOut) {
       return;
     }
 
-    setAuthMessage("Signed out.");
-    setSession(null);
     setScreen({ name: "menu" });
     setDraftTemplate(null);
-    setInProgressWorkout(null);
-    setSelectedHistoryWorkout(null);
-    setIsEditingSavedSession(false);
     setPendingTemplateUpdate(null);
+    setInviteEmail("");
+    setInviteMessage(null);
+    clearAllWorkoutState();
   }
 
   async function handleInviteFriend() {
@@ -227,24 +140,11 @@ export function AppShell() {
     }
   }
 
-  function openTemplate(template: WorkoutTemplate) {
-    const nextSession = createSessionFromTemplate(template, workouts);
-    setInProgressWorkout(nextSession);
-    setSelectedHistoryWorkout(null);
-    setIsEditingSavedSession(false);
-    setScreen({ name: "detail", returnTo: "menu" });
-  }
-
-  function openWorkout(workout: WorkoutSession) {
-    setSelectedHistoryWorkout(structuredClone(workout));
-    setIsEditingSavedSession(false);
-    setScreen({ name: "detail", returnTo: "account" });
-  }
-
   function openTemplateEditor(mode: "create" | "edit", template?: WorkoutTemplate) {
     const nextTemplate = template
       ? structuredClone(normalizeTemplate(template))
       : createEmptyTemplate();
+
     setDraftTemplate(nextTemplate);
     setIsEditingSavedSession(false);
     setScreen({
@@ -255,254 +155,14 @@ export function AppShell() {
   }
 
   async function handleSaveTemplate(template: WorkoutTemplate) {
-    if (!session?.user.id) {
+    const didSave = await saveTemplateRecord(template);
+
+    if (!didSave) {
       return;
     }
 
-    setIsSavingTemplate(true);
-    try {
-      const normalized = normalizeTemplate(template);
-      await saveTemplate(session.user.id, normalized);
-      const nextTemplates = await fetchTemplates();
-      setTemplates(nextTemplates);
-      setDraftTemplate(null);
-      setScreen({ name: "menu" });
-    } catch (error) {
-      setAuthMessage(
-        error instanceof Error ? error.message : "Failed to save template.",
-      );
-    } finally {
-      setIsSavingTemplate(false);
-    }
-  }
-
-  function updateActiveWorkoutSet(
-    exerciseIndex: number,
-    setIndex: number,
-    field: keyof WorkoutSetEntry,
-    value: string | boolean,
-  ) {
-    const setter =
-      screen.name === "detail" && screen.returnTo === "account"
-        ? setSelectedHistoryWorkout
-        : setInProgressWorkout;
-
-    setter((current) => {
-      if (!current) {
-        return current;
-      }
-
-      return {
-        ...current,
-        exercises: current.exercises.map((exercise, currentExerciseIndex) => {
-          if (currentExerciseIndex !== exerciseIndex) {
-            return exercise;
-          }
-
-          if ((field === "weight" || field === "reps") && typeof value === "string") {
-            const defaultField =
-              field === "weight" ? "defaultWeight" : "defaultReps";
-            const touchedField =
-              field === "weight" ? "weightTouched" : "repsTouched";
-
-            return {
-              ...exercise,
-              sets: exercise.sets.map((set, currentSetIndex) => {
-                if (currentSetIndex === setIndex) {
-                  const nextSet = updateSetWithDefaults(set, field, value);
-                  return {
-                    ...nextSet,
-                    [defaultField]: value === "" ? nextSet[defaultField] : value,
-                  };
-                }
-
-                if (currentSetIndex < setIndex) {
-                  return set;
-                }
-
-                const currentValue = set[field];
-                const currentDefault = set[defaultField];
-                const isUntouchedDefault =
-                  !set[touchedField] &&
-                  (currentValue === "" || currentValue === currentDefault);
-
-                if (!isUntouchedDefault) {
-                  return set;
-                }
-
-                return {
-                  ...set,
-                  [defaultField]: value === "" ? currentDefault : value,
-                  [field]: currentValue === "" ? "" : value,
-                  [touchedField]: false,
-                };
-              }),
-            };
-          }
-
-          return {
-            ...exercise,
-            sets: exercise.sets.map((set, currentSetIndex) =>
-              currentSetIndex === setIndex
-                ? updateSetWithDefaults(set, field, value)
-                : set,
-            ),
-          };
-        }),
-      };
-    });
-  }
-
-  function updateActiveWorkoutName(exerciseIndex: number, value: string) {
-    const setter =
-      screen.name === "detail" && screen.returnTo === "account"
-        ? setSelectedHistoryWorkout
-        : setInProgressWorkout;
-
-    setter((current) => {
-      if (!current) {
-        return current;
-      }
-
-      return {
-        ...current,
-        exercises: current.exercises.map((exercise, currentExerciseIndex) =>
-          currentExerciseIndex === exerciseIndex
-            ? { ...exercise, name: value }
-            : exercise,
-        ),
-      };
-    });
-  }
-
-  function updateActiveWorkoutNote(exerciseIndex: number, value: string) {
-    const setter =
-      screen.name === "detail" && screen.returnTo === "account"
-        ? setSelectedHistoryWorkout
-        : setInProgressWorkout;
-
-    setter((current) => {
-      if (!current) {
-        return current;
-      }
-
-      return {
-        ...current,
-        exercises: current.exercises.map((exercise, currentExerciseIndex) =>
-          currentExerciseIndex === exerciseIndex
-            ? { ...exercise, note: value }
-            : exercise,
-        ),
-      };
-    });
-  }
-
-  function updateActiveWorkoutCompletedAt(value: string) {
-    const setter =
-      screen.name === "detail" && screen.returnTo === "account"
-        ? setSelectedHistoryWorkout
-        : setInProgressWorkout;
-
-    setter((current) => {
-      if (!current) {
-        return current;
-      }
-
-      return {
-        ...current,
-        completedAt: value === "" ? null : new Date(`${value}T12:00:00`).toISOString(),
-      };
-    });
-  }
-
-  function addActiveWorkoutExercise() {
-    const setter =
-      screen.name === "detail" && screen.returnTo === "account"
-        ? setSelectedHistoryWorkout
-        : setInProgressWorkout;
-
-    setter((current) => {
-      if (!current) {
-        return current;
-      }
-
-      return {
-        ...current,
-        exercises: [
-          ...current.exercises,
-          createSessionExercise(`Exercise ${current.exercises.length + 1}`),
-        ],
-      };
-    });
-  }
-
-  function removeActiveWorkoutExercise(exerciseIndex: number) {
-    const setter =
-      screen.name === "detail" && screen.returnTo === "account"
-        ? setSelectedHistoryWorkout
-        : setInProgressWorkout;
-
-    setter((current) => {
-      if (!current || current.exercises.length <= 1) {
-        return current;
-      }
-
-      return {
-        ...current,
-        exercises: current.exercises.filter(
-          (_exercise, currentExerciseIndex) => currentExerciseIndex !== exerciseIndex,
-        ),
-      };
-    });
-  }
-
-  function addActiveWorkoutSet(exerciseIndex: number) {
-    const setter =
-      screen.name === "detail" && screen.returnTo === "account"
-        ? setSelectedHistoryWorkout
-        : setInProgressWorkout;
-
-    setter((current) => {
-      if (!current) {
-        return current;
-      }
-
-      return {
-        ...current,
-        exercises: current.exercises.map((exercise, currentExerciseIndex) =>
-          currentExerciseIndex === exerciseIndex
-            ? { ...exercise, sets: [...exercise.sets, createSessionSetFromExercise(exercise)] }
-            : exercise,
-        ),
-      };
-    });
-  }
-
-  function removeActiveWorkoutSet(exerciseIndex: number) {
-    const setter =
-      screen.name === "detail" && screen.returnTo === "account"
-        ? setSelectedHistoryWorkout
-        : setInProgressWorkout;
-
-    setter((current) => {
-      if (!current) {
-        return current;
-      }
-
-      return {
-        ...current,
-        exercises: current.exercises.map((exercise, currentExerciseIndex) => {
-          if (currentExerciseIndex !== exerciseIndex || exercise.sets.length <= 1) {
-            return exercise;
-          }
-
-          return {
-            ...exercise,
-            sets: exercise.sets.slice(0, -1),
-          };
-        }),
-      };
-    });
+    setDraftTemplate(null);
+    setScreen({ name: "menu" });
   }
 
   async function handleDeleteWorkout() {
@@ -510,27 +170,18 @@ export function AppShell() {
       return;
     }
 
-    if (screen.name === "detail" && screen.returnTo === "account") {
-      setIsSavingWorkout(true);
-      try {
-        await deleteCompletedWorkout(activeWorkout.id);
-        const nextWorkouts = await fetchCompletedWorkouts();
-        setWorkouts(nextWorkouts);
-        setSelectedHistoryWorkout(null);
-        setIsEditingSavedSession(false);
-        setScreen({ name: "account" });
-      } catch (error) {
-        setAuthMessage(
-          error instanceof Error ? error.message : "Failed to delete workout.",
-        );
-      } finally {
-        setIsSavingWorkout(false);
+    if (detailSource === "account") {
+      const didDelete = await deleteWorkoutRecord(activeWorkout.id);
+      if (!didDelete) {
+        return;
       }
+
+      clearHistoryWorkout();
+      setScreen({ name: "account" });
       return;
     }
 
-    setInProgressWorkout(null);
-    setIsEditingSavedSession(false);
+    clearInProgressWorkout();
     setScreen({ name: "menu" });
   }
 
@@ -538,43 +189,20 @@ export function AppShell() {
     completedWorkout: WorkoutSession,
     options?: { updateTemplate?: boolean; template?: WorkoutTemplate },
   ) {
-    if (!session?.user.id) {
+    const didSave = await persistWorkoutRecord(completedWorkout, options);
+
+    if (!didSave) {
       return;
     }
 
-    setIsSavingWorkout(true);
-    try {
-      setPendingTemplateUpdate(null);
-
-      if (options?.updateTemplate && options.template) {
-        await saveTemplate(
-          session.user.id,
-          createTemplateFromSession(completedWorkout, options.template),
-        );
-      }
-
-      await saveCompletedWorkout(session.user.id, completedWorkout);
-      const [nextTemplates, nextWorkouts] = await Promise.all([
-        fetchTemplates(),
-        fetchCompletedWorkouts(),
-      ]);
-      setTemplates(nextTemplates);
-      setWorkouts(nextWorkouts);
-      if (screen.name === "detail" && screen.returnTo === "account") {
-        setSelectedHistoryWorkout(null);
-        setIsEditingSavedSession(false);
-      } else {
-        setInProgressWorkout(null);
-      }
-      setPendingTemplateUpdate(null);
-      setScreen({ name: "account" });
-    } catch (error) {
-      setAuthMessage(
-        error instanceof Error ? error.message : "Failed to save workout.",
-      );
-    } finally {
-      setIsSavingWorkout(false);
+    if (detailSource === "account") {
+      clearHistoryWorkout();
+    } else {
+      clearInProgressWorkout();
     }
+
+    setPendingTemplateUpdate(null);
+    setScreen({ name: "account" });
   }
 
   async function handleCompleteWorkout() {
@@ -604,17 +232,6 @@ export function AppShell() {
     await persistWorkout(completedWorkout);
   }
 
-  const currentDraft =
-    screen.name === "editor" && draftTemplate ? draftTemplate : null;
-
-  const activeWorkout =
-    screen.name === "detail"
-      ? screen.returnTo === "account"
-        ? selectedHistoryWorkout
-        : inProgressWorkout
-      : null;
-  const canManageInvites = process.env.NEXT_PUBLIC_ENABLE_INVITES === "true";
-
   if (isLoading) {
     return (
       <main className="page-shell">
@@ -636,7 +253,7 @@ export function AppShell() {
         email={email}
         isSendingLink={isSendingLink}
         onEmailChange={setEmail}
-        onSubmit={() => void handleMagicLinkSignIn()}
+        onSubmit={() => void signInWithMagicLink()}
       />
     );
   }
@@ -650,8 +267,7 @@ export function AppShell() {
               accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
               onSelectAccount={() => {
                 setDraftTemplate(null);
-                setSelectedHistoryWorkout(null);
-                setIsEditingSavedSession(false);
+                clearHistoryWorkout();
                 setScreen({ name: "account" });
               }}
               onSelectTemplates={() => {
@@ -677,8 +293,7 @@ export function AppShell() {
             accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
             onSelectAccount={() => {
               setDraftTemplate(null);
-              setSelectedHistoryWorkout(null);
-              setIsEditingSavedSession(false);
+              clearHistoryWorkout();
               setScreen({ name: "account" });
             }}
             onSelectTemplates={() => {
@@ -698,10 +313,14 @@ export function AppShell() {
                 if (!inProgressWorkout) {
                   return;
                 }
-                setSelectedHistoryWorkout(null);
+
+                clearHistoryWorkout();
                 setScreen({ name: "detail", returnTo: "menu" });
               }}
-              onSelectTemplate={openTemplate}
+              onSelectTemplate={(template) => {
+                openTemplate(template);
+                setScreen({ name: "detail", returnTo: "menu" });
+              }}
             />
           ) : null}
 
@@ -715,7 +334,10 @@ export function AppShell() {
               isInviting={isInviting}
               onInviteEmailChange={setInviteEmail}
               onInviteSubmit={() => void handleInviteFriend()}
-              onOpenWorkout={openWorkout}
+              onOpenWorkout={(workout) => {
+                openWorkout(workout);
+                setScreen({ name: "detail", returnTo: "account" });
+              }}
               onSignOut={() => void handleLogout()}
               onThemeChange={setThemeMode}
               themeMode={themeMode}
@@ -725,12 +347,11 @@ export function AppShell() {
 
           {screen.name === "detail" && activeWorkout ? (
             <TemplateDetail
-              onAddExercise={addActiveWorkoutExercise}
-              onAddSet={addActiveWorkoutSet}
+              onAddExercise={addExercise}
+              onAddSet={addSet}
               onBack={() => {
                 if (screen.returnTo === "account") {
-                  setSelectedHistoryWorkout(null);
-                  setIsEditingSavedSession(false);
+                  clearHistoryWorkout();
                 }
                 setScreen(screenFromReturnTarget(screen.returnTo));
               }}
@@ -740,19 +361,13 @@ export function AppShell() {
               isEditingSavedSession={isEditingSavedSession}
               isReadOnly={screen.returnTo === "account" && !isEditingSavedSession}
               isSavedSession={screen.returnTo === "account"}
-              onRemoveExercise={removeActiveWorkoutExercise}
-              onRemoveSet={removeActiveWorkoutSet}
+              onRemoveExercise={removeExercise}
+              onRemoveSet={removeSet}
               onStartEditing={() => setIsEditingSavedSession(true)}
-              onUpdateCompletedAt={updateActiveWorkoutCompletedAt}
-              onUpdateExerciseName={(exerciseIndex, value) =>
-                updateActiveWorkoutName(exerciseIndex, value)
-              }
-              onUpdateNote={(exerciseIndex, value) =>
-                updateActiveWorkoutNote(exerciseIndex, value)
-              }
-              onUpdateSet={(exerciseIndex, setIndex, field, value) =>
-                updateActiveWorkoutSet(exerciseIndex, setIndex, field, value)
-              }
+              onUpdateCompletedAt={updateCompletedAt}
+              onUpdateExerciseName={updateExerciseName}
+              onUpdateNote={updateNote}
+              onUpdateSet={updateSet}
               session={activeWorkout}
             />
           ) : null}
