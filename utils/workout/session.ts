@@ -94,9 +94,9 @@ export function createSessionFromTemplate(
             completed: false,
             defaultReps,
             defaultWeight,
-            reps: defaultReps,
+            reps: "",
             repsTouched: false,
-            weight: defaultWeight,
+            weight: "",
             weightTouched: false,
             minReps: exercise.repTargets[index]?.minReps ?? "",
             maxReps: exercise.repTargets[index]?.maxReps ?? "",
@@ -120,9 +120,9 @@ export function createWorkoutSetEntry(
     defaultWeight,
     maxReps: defaults?.maxReps ?? "",
     minReps: defaults?.minReps ?? "",
-    reps: defaultReps,
+    reps: "",
     repsTouched: false,
-    weight: defaultWeight,
+    weight: "",
     weightTouched: false,
   };
 }

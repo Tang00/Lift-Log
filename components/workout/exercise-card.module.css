@@ -105,12 +105,13 @@
 
 .compactInput {
   padding: 8px;
+  font-size: 16px;
 }
 
 .spreadsheetInput {
   min-width: 0;
   border-radius: 8px;
-  text-align: center;
+  text-align: left;
   background: color-mix(in srgb, var(--surface-strong) 88%, white 12%);
   color: var(--text);
 }
@@ -119,11 +120,44 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  cursor: pointer;
 }
 
-.checkboxCell input {
-  width: 13px;
-  height: 13px;
+.checkboxInput {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkboxBox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(87, 69, 47, 0.18);
+  background: color-mix(in srgb, var(--surface-strong) 90%, white 10%);
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.checkboxInput:checked + .checkboxBox {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.checkboxInput:focus-visible + .checkboxBox {
+  outline: 2px solid rgba(214, 99, 58, 0.24);
+  outline-offset: 2px;
+}
+
+.checkboxInput:active + .checkboxBox {
+  transform: scale(0.96);
+}
+
+.checkboxInput:disabled + .checkboxBox {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .footerControls {

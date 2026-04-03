@@ -68,23 +68,6 @@ export function ExerciseCard({
     }
   }
 
-  function restoreDefaultValue(
-    setIndex: number,
-    field: "weight" | "reps",
-    value: string,
-    defaultValue: string,
-    completed: boolean,
-  ) {
-    if (!completed && value.trim() === "") {
-      onUpdateSet(setIndex, field, defaultValue);
-      onUpdateSet(
-        setIndex,
-        field === "weight" ? "weightTouched" : "repsTouched",
-        false,
-      );
-    }
-  }
-
   return (
     <article className={styles.card}>
       <div className={styles.header}>
@@ -176,16 +159,7 @@ export function ExerciseCard({
                   set.weightTouched,
                 )
               }
-              onBlur={() =>
-                restoreDefaultValue(
-                  index,
-                  "weight",
-                  set.weight,
-                  set.defaultWeight,
-                  set.completed,
-                )
-              }
-              placeholder="0"
+              placeholder={set.defaultWeight}
             />
 
             <input
@@ -211,27 +185,20 @@ export function ExerciseCard({
                   set.repsTouched,
                 )
               }
-              onBlur={() =>
-                restoreDefaultValue(
-                  index,
-                  "reps",
-                  set.reps,
-                  set.defaultReps,
-                  set.completed,
-                )
-              }
-              placeholder="0"
+              placeholder={set.defaultReps}
             />
 
             <label className={styles.checkboxCell}>
               <input
                 checked={set.completed}
+                className={styles.checkboxInput}
                 disabled={readOnly}
                 type="checkbox"
                 onChange={(event) =>
                   onUpdateSet(index, "completed", event.target.checked)
                 }
               />
+              <span aria-hidden="true" className={styles.checkboxBox} />
             </label>
           </div>
         ))}

@@ -299,6 +299,47 @@ export function AppShell() {
             return exercise;
           }
 
+          if ((field === "weight" || field === "reps") && typeof value === "string") {
+            const defaultField =
+              field === "weight" ? "defaultWeight" : "defaultReps";
+            const touchedField =
+              field === "weight" ? "weightTouched" : "repsTouched";
+
+            return {
+              ...exercise,
+              sets: exercise.sets.map((set, currentSetIndex) => {
+                if (currentSetIndex === setIndex) {
+                  const nextSet = updateSetWithDefaults(set, field, value);
+                  return {
+                    ...nextSet,
+                    [defaultField]: value === "" ? nextSet[defaultField] : value,
+                  };
+                }
+
+                if (currentSetIndex < setIndex) {
+                  return set;
+                }
+
+                const currentValue = set[field];
+                const currentDefault = set[defaultField];
+                const isUntouchedDefault =
+                  !set[touchedField] &&
+                  (currentValue === "" || currentValue === currentDefault);
+
+                if (!isUntouchedDefault) {
+                  return set;
+                }
+
+                return {
+                  ...set,
+                  [defaultField]: value === "" ? currentDefault : value,
+                  [field]: currentValue === "" ? "" : value,
+                  [touchedField]: false,
+                };
+              }),
+            };
+          }
+
           return {
             ...exercise,
             sets: exercise.sets.map((set, currentSetIndex) =>

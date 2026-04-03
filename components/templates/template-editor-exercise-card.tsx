@@ -17,11 +17,6 @@ type TemplateEditorExerciseCardProps = {
     field: "minReps" | "maxReps",
     value: string,
   ) => void;
-  onRepTargetFocus: (
-    setIndex: number,
-    field: "minReps" | "maxReps",
-    value: string,
-  ) => void;
 };
 
 export function TemplateEditorExerciseCard({
@@ -33,7 +28,6 @@ export function TemplateEditorExerciseCard({
   onRemove,
   onRemoveSet,
   onRepTargetChange,
-  onRepTargetFocus,
 }: TemplateEditorExerciseCardProps) {
   function sanitizeIntegerInput(value: string) {
     if (value === "" || /^\d+$/.test(value)) {
@@ -99,8 +93,6 @@ export function TemplateEditorExerciseCard({
                         onRepTargetChange(setIndex, "minReps", nextValue);
                       }
                     }}
-                    onFocus={() => onRepTargetFocus(setIndex, "minReps", target.minReps)}
-                    placeholder="8"
                   />
                 </label>
                 <label className={styles.repTargetField}>
@@ -116,8 +108,6 @@ export function TemplateEditorExerciseCard({
                         onRepTargetChange(setIndex, "maxReps", nextValue);
                       }
                     }}
-                    onFocus={() => onRepTargetFocus(setIndex, "maxReps", target.maxReps)}
-                    placeholder=""
                   />
                 </label>
                 <button

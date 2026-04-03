@@ -38,19 +38,6 @@ export function TemplateEditor({
     setDraft(template);
   }, [template]);
 
-  function clearRepTargetDefault(
-    exerciseId: string,
-    setIndex: number,
-    field: "minReps" | "maxReps",
-    value: string,
-  ) {
-    const defaultValue = field === "minReps" ? "8" : "";
-
-    if (value === defaultValue) {
-      updateRepTarget(exerciseId, setIndex, field, "");
-    }
-  }
-
   function updateExercise(
     exerciseId: string,
     field: keyof TemplateExercise,
@@ -215,9 +202,6 @@ export function TemplateEditor({
             onRepTargetChange={(setIndex, field, value) =>
               updateRepTarget(exercise.id, setIndex, field, value)
             }
-            onRepTargetFocus={(setIndex, field, value) =>
-              clearRepTargetDefault(exercise.id, setIndex, field, value)
-            }
           />
         ))}
       </div>
@@ -226,7 +210,11 @@ export function TemplateEditor({
         Add exercise
       </button>
 
-      <button className="primary-button" type="button" onClick={() => onSave(draft)}>
+      <button
+        className="primary-button"
+        type="button"
+        onClick={() => onSave(draft)}
+      >
         Save template
       </button>
     </div>
