@@ -1,0 +1,76 @@
+.header {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: start;
+  gap: 6px;
+  width: 100%;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  align-items: flex-start;
+}
+
+.title h2 {
+  margin: 0;
+  min-width: 0;
+}
+
+.panel {
+  padding: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.repTargetList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.repTargetRow {
+  display: grid;
+  grid-template-columns: 64px 1fr 1fr;
+  gap: 8px;
+  align-items: end;
+}
+
+.repTargetLabel {
+  font-weight: 700;
+}
+
+.repTargetField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.repTargetCaption {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  .header {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 6px;
+  }
+}

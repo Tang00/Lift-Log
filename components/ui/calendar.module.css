@@ -1,0 +1,100 @@
+.calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 4px;
+}
+
+.title {
+  text-align: center;
+  font-weight: 700;
+}
+
+.calendarArrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.calendarArrow:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.monthWeekdays,
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.monthWeekday {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.monthDay {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: rgba(87, 69, 47, 0.08);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.monthDayEmpty {
+  background: transparent;
+}
+
+.monthLevel2 {
+  background: rgba(214, 99, 58, 0.38);
+}
+
+.monthLevel3 {
+  background: rgba(214, 99, 58, 0.6);
+}
+
+.monthLevel4 {
+  background: rgba(214, 99, 58, 0.82);
+  color: white;
+}
+
+.monthDayToday {
+  border-color: rgba(71, 54, 35, 0.48);
+}
+
+.monthDaySelected {
+  background: rgba(214, 99, 58, 0.2);
+  border-color: rgba(214, 99, 58, 0.5);
+}
+
+.monthDay:disabled {
+  cursor: default;
+}
+
+@media (max-width: 520px) {
+  .monthWeekdays,
+  .monthGrid {
+    gap: 4px;
+  }
+
+  .monthDay {
+    border-radius: 5px;
+    font-size: 0.78rem;
+  }
+}

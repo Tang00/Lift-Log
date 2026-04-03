@@ -1,5 +1,7 @@
 "use client";
 
+import styles from "@/components/auth/auth-screen.module.css";
+
 type AuthScreenProps = {
   authMessage: string | null;
   email: string;
@@ -19,17 +21,14 @@ export function AuthScreen({
     <main className="page-shell">
       <section className="mobile-frame">
         <div className="screen">
-          <div className="hero-card">
+          <div className={styles.heroCard}>
             <h1>Lift Log</h1>
           </div>
 
-          <div className="signin-card">
+          <div className={styles.signinCard}>
             <h2>Sign in</h2>
 
-            <form
-              className="signin-form"
-              onSubmit={(event) => event.preventDefault()}
-            >
+            <form className={styles.form} onSubmit={(event) => event.preventDefault()}>
               <input
                 aria-label="Email address"
                 className="text-input"
@@ -40,13 +39,13 @@ export function AuthScreen({
               />
               <button
                 className="primary-button"
+                disabled={isSendingLink}
                 type="button"
                 onClick={onSubmit}
-                disabled={isSendingLink}
               >
                 {isSendingLink ? "Sending..." : "Send magic link"}
               </button>
-              {authMessage ? <p className="auth-message">{authMessage}</p> : null}
+              {authMessage ? <p className={styles.authMessage}>{authMessage}</p> : null}
             </form>
           </div>
         </div>

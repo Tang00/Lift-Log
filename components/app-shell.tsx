@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 
-import { AuthScreen } from "@/components/auth-screen";
-import { AccountView } from "@/components/account-view";
-import { SiteHeader } from "@/components/site-header";
-import { TemplateDetail } from "@/components/template-detail";
-import { TemplateEditor } from "@/components/template-editor";
-import { TemplateMenu } from "@/components/template-menu";
+import { AccountView } from "@/components/account/account-view";
+import { AuthScreen } from "@/components/auth/auth-screen";
+import { SiteHeader } from "@/components/layout/site-header";
+import { TemplateEditor } from "@/components/templates/template-editor";
+import { TemplateMenu } from "@/components/templates/template-menu";
+import { TemplateDetail } from "@/components/workout/template-detail";
+import { useThemeMode } from "@/hooks/use-theme-mode";
 import type {
   WorkoutSession,
   WorkoutSetEntry,
@@ -22,118 +23,18 @@ import {
   saveCompletedWorkout,
   saveTemplate,
 } from "@/utils/supabase/workout-store";
-
-type ThemeMode = "system" | "light" | "dark";
+import {
+  createEmptyTemplate,
+  createSessionFromTemplate,
+  normalizeTemplate,
+  updateSetWithDefaults,
+} from "@/utils/workout/session";
 
 type Screen =
   | { name: "menu" }
   | { name: "account" }
   | { name: "detail"; returnTo: "menu" | "account" }
   | { name: "editor"; mode: "create" | "edit"; templateId: string };
-
-function createEmptyTemplate(): WorkoutTemplate {
-  return {
-    id: crypto.randomUUID(),
-    title: "",
-    summary: "",
-    exercises: [
-      {
-        id: crypto.randomUUID(),
-        name: "",
-        note: "",
-        expectedSets: 3,
-        repTargets: [
-          { minReps: "8", maxReps: "" },
-          { minReps: "8", maxReps: "" },
-          { minReps: "8", maxReps: "" },
-        ],
-        previousResults: [],
-      },
-    ],
-  };
-}
-
-function normalizeTemplate(template: WorkoutTemplate): WorkoutTemplate {
-  return {
-    ...template,
-    exercises: template.exercises.map((exercise) => {
-      const fallbackTarget =
-        exercise.repTargets && exercise.repTargets.length > 0
-          ? exercise.repTargets
-          : Array.from({ length: Math.max(1, exercise.expectedSets) }, () => ({
-              minReps: "",
-              maxReps: "",
-            }));
-
-      const repTargets = Array.from(
-        { length: Math.max(1, exercise.expectedSets) },
-        (_, index) => fallbackTarget[index] ?? fallbackTarget[fallbackTarget.length - 1],
-      );
-
-      return {
-        ...exercise,
-        id: exercise.id || crypto.randomUUID(),
-        note: exercise.note ?? "",
-        repTargets,
-      };
-    }),
-  };
-}
-
-function createSessionFromTemplate(
-  template: WorkoutTemplate,
-  completedWorkouts: WorkoutSession[],
-): WorkoutSession {
-  const normalizedTemplate = normalizeTemplate(template);
-  const lastCompletedWorkout = completedWorkouts.find(
-    (workout) => workout.templateId === normalizedTemplate.id,
-  );
-
-  return {
-    id: crypto.randomUUID(),
-    completedAt: null,
-    templateId: normalizedTemplate.id,
-    title: normalizedTemplate.title,
-    exercises: normalizedTemplate.exercises.map((exercise) => {
-      const previousExercise = lastCompletedWorkout?.exercises.find(
-        (item) => item.exerciseId === exercise.id,
-      );
-
-      return {
-        exerciseId: exercise.id,
-        name: exercise.name,
-        note: "",
-        templateNote: exercise.note,
-        previousResults: previousExercise?.sets.map((set) => ({
-          weight: set.weight,
-          reps: set.reps,
-        })),
-        sets: Array.from({ length: exercise.expectedSets }, (_, index) => {
-          const defaultWeight =
-            previousExercise?.sets[index]?.weight?.trim() !== ""
-              ? previousExercise?.sets[index]?.weight ?? "0"
-              : "0";
-          const defaultReps =
-            exercise.repTargets[index]?.minReps ||
-            exercise.repTargets[index]?.maxReps ||
-            "0";
-
-          return {
-            completed: false,
-            defaultReps,
-            defaultWeight,
-            reps: defaultReps,
-            repsTouched: false,
-            weight: defaultWeight,
-            weightTouched: false,
-            minReps: exercise.repTargets[index]?.minReps ?? "",
-            maxReps: exercise.repTargets[index]?.maxReps ?? "",
-          };
-        }),
-      };
-    }),
-  };
-}
 
 function screenFromReturnTarget(target: "menu" | "account"): Extract<
   Screen,
@@ -142,51 +43,9 @@ function screenFromReturnTarget(target: "menu" | "account"): Extract<
   return target === "account" ? { name: "account" } : { name: "menu" };
 }
 
-function updateSetWithDefaults(
-  set: WorkoutSetEntry,
-  field: keyof WorkoutSetEntry,
-  value: string | boolean,
-) {
-  if (field === "weight" && typeof value === "string") {
-    return {
-      ...set,
-      weight: value,
-      weightTouched: true,
-    };
-  }
-
-  if (field === "reps" && typeof value === "string") {
-    return {
-      ...set,
-      reps: value,
-      repsTouched: true,
-    };
-  }
-
-  if (field === "completed" && typeof value === "boolean") {
-    return {
-      ...set,
-      completed: value,
-      weight:
-        value && (set.weight.trim() === "" || !set.weightTouched)
-          ? set.defaultWeight
-          : set.weight,
-      reps:
-        value && (set.reps.trim() === "" || !set.repsTouched)
-          ? set.defaultReps
-          : set.reps,
-    };
-  }
-
-  return {
-    ...set,
-    [field]: value,
-  };
-}
-
 export function AppShell() {
   const [session, setSession] = useState<Session | null>(null);
-  const [email, setEmail] = useState("edwin@example.com");
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
@@ -201,45 +60,10 @@ export function AppShell() {
     useState<WorkoutSession | null>(null);
   const [isEditingSavedSession, setIsEditingSavedSession] = useState(false);
   const [draftTemplate, setDraftTemplate] = useState<WorkoutTemplate | null>(null);
-  const [themeMode, setThemeMode] = useState<ThemeMode>("system");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
   const [isInviting, setIsInviting] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const storedTheme = window.localStorage.getItem("lift-log-theme");
-    if (
-      storedTheme === "system" ||
-      storedTheme === "light" ||
-      storedTheme === "dark"
-    ) {
-      setThemeMode(storedTheme);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof document === "undefined" || typeof window === "undefined") {
-      return;
-    }
-
-    const root = document.documentElement;
-    const body = document.body;
-
-    if (themeMode === "system") {
-      root.removeAttribute("data-theme");
-      body.removeAttribute("data-theme");
-      window.localStorage.removeItem("lift-log-theme");
-      return;
-    }
-
-    root.setAttribute("data-theme", themeMode);
-    body.setAttribute("data-theme", themeMode);
-    window.localStorage.setItem("lift-log-theme", themeMode);
-  }, [themeMode]);
+  const { themeMode, setThemeMode } = useThemeMode();
 
   useEffect(() => {
     let isMounted = true;
@@ -318,7 +142,11 @@ export function AppShell() {
     setAuthMessage(null);
 
     const redirectTo =
-      typeof window !== "undefined" ? window.location.origin : undefined;
+      typeof window !== "undefined"
+        ? window.location.hostname === "localhost"
+          ? "http://localhost:3000"
+          : process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+        : process.env.NEXT_PUBLIC_SITE_URL;
 
     const { error } = await supabase.auth.signInWithOtp({
       email,

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import styles from "@/components/templates/template-editor.module.css";
+import { TemplateEditorExerciseCard } from "@/components/templates/template-editor-exercise-card";
 import type { TemplateExercise, WorkoutTemplate } from "@/types/workout";
 
 type TemplateEditorProps = {
@@ -145,7 +147,7 @@ export function TemplateEditor({
 
   return (
     <div className="stack">
-      <div className="workout-screen-header">
+      <div className={styles.header}>
         <button
           aria-label="Go back"
           className="back-arrow"
@@ -154,14 +156,14 @@ export function TemplateEditor({
         >
           ←
         </button>
-        <div className="workout-screen-title">
+        <div className={styles.title}>
           <h2>{heading}</h2>
         </div>
       </div>
 
-      <div className="panel editor-panel">
-        <div className="editor-grid">
-          <label className="editor-field">
+      <div className={`panel ${styles.panel}`}>
+        <div className={styles.grid}>
+          <label className={styles.field}>
             <span className="field-label">Template name</span>
             <input
               className="text-input"
@@ -173,7 +175,7 @@ export function TemplateEditor({
               placeholder="Push Day"
             />
           </label>
-          <label className="editor-field">
+          <label className={styles.field}>
             <span className="field-label">Summary</span>
             <input
               className="text-input"
@@ -190,120 +192,21 @@ export function TemplateEditor({
 
       <div className="stack">
         {draft.exercises.map((exercise, index) => (
-          <div className="panel editor-panel" key={exercise.id}>
-            <div className="panel-header">
-              <h3>Exercise {index + 1}</h3>
-              <button
-                className="template-remove-button"
-                type="button"
-                onClick={() => removeExercise(exercise.id)}
-              >
-                Remove
-              </button>
-            </div>
-
-            <div className="editor-grid">
-              <label className="editor-field">
-                <span className="field-label">Exercise name</span>
-                <input
-                  className="text-input"
-                  type="text"
-                  value={exercise.name}
-                  onChange={(event) =>
-                    updateExercise(exercise.id, "name", event.target.value)
-                  }
-                  placeholder="Bench Press"
-                />
-              </label>
-
-              <label className="editor-field editor-field-full">
-                <span className="field-label">Template note</span>
-                <textarea
-                  className="text-input text-area-input"
-                  value={exercise.note}
-                  onChange={(event) =>
-                    updateExercise(exercise.id, "note", event.target.value)
-                  }
-                  placeholder="Shown under the exercise name during the workout"
-                  rows={2}
-                />
-              </label>
-
-              <label className="editor-field">
-                <span className="field-label">Expected sets</span>
-                <input
-                  className="text-input"
-                  type="number"
-                  min="1"
-                  value={exercise.expectedSets}
-                  onChange={(event) =>
-                    updateSetCount(exercise.id, Number(event.target.value || 1))
-                  }
-                />
-              </label>
-
-              <div className="editor-field editor-field-full">
-                <span className="field-label">Rep targets by set</span>
-                <div className="rep-target-list">
-                  {exercise.repTargets.map((target, setIndex) => (
-                    <div className="rep-target-row" key={`${exercise.id}-${setIndex + 1}`}>
-                      <span className="rep-target-label">Set {setIndex + 1}</span>
-                      <label className="rep-target-field">
-                        <span className="rep-target-caption">Min</span>
-                        <input
-                          className="text-input"
-                          type="text"
-                          value={target.minReps}
-                          onChange={(event) =>
-                            updateRepTarget(
-                              exercise.id,
-                              setIndex,
-                              "minReps",
-                              event.target.value,
-                            )
-                          }
-                          onFocus={() =>
-                            clearRepTargetDefault(
-                              exercise.id,
-                              setIndex,
-                              "minReps",
-                              target.minReps,
-                            )
-                          }
-                          placeholder="8"
-                        />
-                      </label>
-                      <label className="rep-target-field">
-                        <span className="rep-target-caption">Max</span>
-                        <input
-                          className="text-input"
-                          type="text"
-                          value={target.maxReps}
-                          onChange={(event) =>
-                            updateRepTarget(
-                              exercise.id,
-                              setIndex,
-                              "maxReps",
-                              event.target.value,
-                            )
-                          }
-                          onFocus={() =>
-                            clearRepTargetDefault(
-                              exercise.id,
-                              setIndex,
-                              "maxReps",
-                              target.maxReps,
-                            )
-                          }
-                          placeholder=""
-                        />
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <TemplateEditorExerciseCard
+            key={exercise.id}
+            exercise={exercise}
+            index={index}
+            onNameChange={(value) => updateExercise(exercise.id, "name", value)}
+            onNoteChange={(value) => updateExercise(exercise.id, "note", value)}
+            onRemove={() => removeExercise(exercise.id)}
+            onRepTargetChange={(setIndex, field, value) =>
+              updateRepTarget(exercise.id, setIndex, field, value)
+            }
+            onRepTargetFocus={(setIndex, field, value) =>
+              clearRepTargetDefault(exercise.id, setIndex, field, value)
+            }
+            onSetCountChange={(value) => updateSetCount(exercise.id, value)}
+          />
         ))}
       </div>
 

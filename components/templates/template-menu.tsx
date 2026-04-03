@@ -1,0 +1,67 @@
+"use client";
+
+import { InProgressWorkoutCard } from "@/components/templates/in-progress-workout-card";
+import { TemplateCard } from "@/components/templates/template-card";
+import cardStyles from "@/components/templates/template-card.module.css";
+import { Panel } from "@/components/ui/panel";
+import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
+
+type TemplateMenuProps = {
+  inProgressWorkout: WorkoutSession | null;
+  onCreateTemplate: () => void;
+  onEditTemplate: (template: WorkoutTemplate) => void;
+  onResumeWorkout: () => void;
+  onSelectTemplate: (template: WorkoutTemplate) => void;
+  templates: WorkoutTemplate[];
+};
+
+export function TemplateMenu({
+  inProgressWorkout,
+  onCreateTemplate,
+  onEditTemplate,
+  onResumeWorkout,
+  onSelectTemplate,
+  templates,
+}: TemplateMenuProps) {
+  return (
+    <div className="stack">
+      {inProgressWorkout ? (
+        <Panel title="In Progress">
+          <InProgressWorkoutCard
+            workout={inProgressWorkout}
+            onResumeWorkout={onResumeWorkout}
+          />
+        </Panel>
+      ) : null}
+
+      <Panel
+        actions={
+          <button
+            aria-label="Create template"
+            className={cardStyles.iconButton}
+            type="button"
+            onClick={onCreateTemplate}
+          >
+            +
+          </button>
+        }
+        title="Templates"
+      >
+        {templates.length === 0 ? (
+          <div className="empty-state">No templates yet.</div>
+        ) : (
+          <div className="template-list">
+            {templates.map((template) => (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                onEdit={() => onEditTemplate(template)}
+                onSelect={() => onSelectTemplate(template)}
+              />
+            ))}
+          </div>
+        )}
+      </Panel>
+    </div>
+  );
+}

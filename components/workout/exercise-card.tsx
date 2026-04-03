@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "@/components/workout/exercise-card.module.css";
 import type { WorkoutExerciseEntry, WorkoutSetEntry } from "@/types/workout";
 
 type ExerciseCardProps = {
@@ -69,15 +70,15 @@ export function ExerciseCard({
   }
 
   return (
-    <article className="exercise-card">
-      <div className="exercise-card-header">
-        <div className="exercise-card-heading">
+    <article className={styles.card}>
+      <div className={styles.header}>
+        <div className={styles.heading}>
           <h3>{exercise.name}</h3>
           {exercise.templateNote ? (
             <div className="exercise-subtext">{exercise.templateNote}</div>
           ) : null}
           <textarea
-            className="text-input text-area-input exercise-note-input"
+            className={`text-input text-area-input ${styles.noteInput}`}
             disabled={readOnly}
             readOnly={readOnly}
             value={exercise.note}
@@ -88,8 +89,8 @@ export function ExerciseCard({
         </div>
       </div>
 
-      <div className="set-table">
-        <div className="set-table-header">
+      <div className={styles.table}>
+        <div className={styles.tableHeader}>
           <span>Set</span>
           <span>Previous</span>
           <span>Weight</span>
@@ -97,24 +98,26 @@ export function ExerciseCard({
           <span>Done</span>
         </div>
         {exercise.sets.map((set, index) => (
-          <div className="set-row" key={`${exercise.exerciseId}-${index + 1}`}>
-            <div className="set-cell set-index-cell">
-              <div className="set-index">{index + 1}</div>
-              <div className="set-target">{formatRepTarget(set)}</div>
+          <div className={styles.row} key={`${exercise.exerciseId}-${index + 1}`}>
+            <div className={`${styles.cell} ${styles.indexCell}`}>
+              <div className={styles.index}>{index + 1}</div>
+              <div className={styles.target}>{formatRepTarget(set)}</div>
             </div>
 
             {exercise.previousResults?.[index] ? (
-              <div className="set-cell previous-set">
+              <div className={`${styles.cell} ${styles.previousSet}`}>
                 {exercise.previousResults[index]?.weight} x{" "}
                 {exercise.previousResults[index]?.reps}
               </div>
             ) : (
-              <div className="set-cell previous-set previous-set-empty">—</div>
+              <div className={`${styles.cell} ${styles.previousSet} ${styles.previousSetEmpty}`}>
+                —
+              </div>
             )}
 
             <input
               aria-label={`${exercise.name} set ${index + 1} weight`}
-              className="text-input compact-input spreadsheet-input"
+              className={`text-input ${styles.compactInput} ${styles.spreadsheetInput}`}
               disabled={readOnly}
               readOnly={readOnly}
               type="text"
@@ -149,7 +152,7 @@ export function ExerciseCard({
 
             <input
               aria-label={`${exercise.name} set ${index + 1} reps`}
-              className="text-input compact-input spreadsheet-input"
+              className={`text-input ${styles.compactInput} ${styles.spreadsheetInput}`}
               disabled={readOnly}
               readOnly={readOnly}
               type="text"
@@ -182,7 +185,7 @@ export function ExerciseCard({
               placeholder="0"
             />
 
-            <label className="checkbox-cell">
+            <label className={styles.checkboxCell}>
               <input
                 checked={set.completed}
                 disabled={readOnly}

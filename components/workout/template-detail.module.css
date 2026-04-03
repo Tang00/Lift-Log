@@ -1,0 +1,68 @@
+.header {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 6px;
+  width: 100%;
+}
+
+.headerActions {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  align-items: flex-start;
+}
+
+.title h2 {
+  margin: 0;
+  min-width: 0;
+}
+
+.sessionDateButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 0;
+  white-space: nowrap;
+  text-align: left;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.actionStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  align-self: stretch;
+}
+
+.actionStack > * {
+  display: block;
+  width: 100%;
+}
+
+@media (max-width: 520px) {
+  .sessionDateButton {
+    font-size: 0.74rem;
+  }
+
+  .actionStack {
+    gap: 10px;
+  }
+
+  .header {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 6px;
+  }
+}

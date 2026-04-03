@@ -1,0 +1,53 @@
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(71, 54, 35, 0.1);
+  border-radius: var(--radius-md);
+  background: var(--surface-strong);
+}
+
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 1;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.editButton {
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: rgba(214, 99, 58, 0.12);
+  color: var(--brand-deep);
+  font-weight: 700;
+}
+
+.iconButton {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: rgba(214, 99, 58, 0.12);
+  color: var(--brand-deep);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.removeButton {
+  padding: 5px 7px;
+  border-radius: 6px;
+  background: rgba(214, 99, 58, 0.08);
+  color: var(--brand-deep);
+  font-weight: 700;
+}

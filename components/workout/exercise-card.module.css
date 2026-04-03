@@ -1,0 +1,140 @@
+.card {
+  border: 1px solid rgba(71, 54, 35, 0.08);
+  border-radius: var(--radius-lg);
+  background: var(--surface-strong);
+  padding: 14px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.heading h3 {
+  margin: 0;
+}
+
+.noteInput {
+  min-height: 42px;
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+  border: 1px solid rgba(87, 69, 47, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-strong);
+}
+
+.tableHeader,
+.row {
+  display: grid;
+  grid-template-columns: 0.9fr 1.3fr 1fr 0.9fr 0.7fr;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+}
+
+.tableHeader {
+  border-bottom: 1px solid rgba(87, 69, 47, 0.08);
+  background: var(--bg-accent);
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.row + .row {
+  border-top: 1px solid rgba(87, 69, 47, 0.08);
+}
+
+.row {
+  background: var(--surface-strong);
+}
+
+.cell {
+  min-width: 0;
+}
+
+.index {
+  font-weight: 800;
+}
+
+.indexCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.target {
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+
+.previousSet {
+  color: var(--brand-deep);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.previousSetEmpty {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.compactInput {
+  padding: 8px;
+}
+
+.spreadsheetInput {
+  min-width: 0;
+  border-radius: 8px;
+  text-align: center;
+  background: color-mix(in srgb, var(--surface-strong) 88%, white 12%);
+  color: var(--text);
+}
+
+.checkboxCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkboxCell input {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 520px) {
+  .tableHeader,
+  .row {
+    grid-template-columns: 0.9fr 1.2fr 0.95fr 0.85fr 0.65fr;
+    gap: 6px;
+    padding: 10px;
+  }
+
+  .tableHeader {
+    font-size: 0.7rem;
+  }
+
+  .previousSet,
+  .target {
+    font-size: 0.74rem;
+  }
+
+  .spreadsheetInput {
+    padding: 9px 8px;
+  }
+}

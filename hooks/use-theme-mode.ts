@@ -1,0 +1,51 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+export type ThemeMode = "system" | "light" | "dark";
+
+const STORAGE_KEY = "lift-log-theme";
+
+export function useThemeMode() {
+  const [themeMode, setThemeMode] = useState<ThemeMode>("system");
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const storedTheme = window.localStorage.getItem(STORAGE_KEY);
+    if (
+      storedTheme === "system" ||
+      storedTheme === "light" ||
+      storedTheme === "dark"
+    ) {
+      setThemeMode(storedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined" || typeof window === "undefined") {
+      return;
+    }
+
+    const root = document.documentElement;
+    const body = document.body;
+
+    if (themeMode === "system") {
+      root.removeAttribute("data-theme");
+      body.removeAttribute("data-theme");
+      window.localStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+
+    root.setAttribute("data-theme", themeMode);
+    body.setAttribute("data-theme", themeMode);
+    window.localStorage.setItem(STORAGE_KEY, themeMode);
+  }, [themeMode]);
+
+  return {
+    setThemeMode,
+    themeMode,
+  };
+}
