@@ -149,16 +149,40 @@ export function useSegmentedScroll(itemCount: number) {
     [itemCount],
   );
 
-  function scrollToIndex(index: number, behavior: ScrollBehavior = "smooth") {
+  function getScrollTopForIndex(index: number) {
     const root = containerRef.current;
     const item = itemRefs.current[index];
 
     if (!root || !item) {
+      return null;
+    }
+
+    return Math.max(getItemTop(root, item), 0);
+  }
+
+  function scrubToIndex(index: number) {
+    const root = containerRef.current;
+    const nextTop = getScrollTopForIndex(index);
+
+    if (!root || nextTop == null) {
+      return;
+    }
+
+    root.scrollTop = nextTop;
+    setActiveIndex(index);
+    setIsScrollActive(true);
+  }
+
+  function scrollToIndex(index: number, behavior: ScrollBehavior = "smooth") {
+    const root = containerRef.current;
+    const nextTop = getScrollTopForIndex(index);
+
+    if (!root || nextTop == null) {
       return;
     }
 
     root.scrollTo({
-      top: Math.max(getItemTop(root, item), 0),
+      top: nextTop,
       behavior,
     });
   }
@@ -168,6 +192,7 @@ export function useSegmentedScroll(itemCount: number) {
     containerRef,
     isScrollActive,
     scrollPaddingBottom,
+    scrubToIndex,
     scrollToIndex,
     setItemRef,
     trailingRef,

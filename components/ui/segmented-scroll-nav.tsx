@@ -67,6 +67,7 @@ export function SegmentedScrollNav({
       onMouseEnter={() => setIsInteracting(true)}
       onMouseLeave={() => setIsInteracting(false)}
       onPointerDown={(event) => {
+        event.preventDefault();
         setIsInteracting(true);
         setActivePointerId(event.pointerId);
         railRef.current?.setPointerCapture(event.pointerId);
@@ -115,6 +116,7 @@ export function SegmentedScrollNav({
           key={`${labels?.[index] ?? "exercise"}-${index}`}
           title={labels?.[index] ?? `Exercise ${index + 1}`}
           type="button"
+          onPointerDown={(event) => event.preventDefault()}
           onClick={() => onSelect(index)}
         />
       ))}

@@ -104,6 +104,7 @@ export function TemplateDetail({
     containerRef,
     isScrollActive,
     scrollPaddingBottom,
+    scrubToIndex,
     scrollToIndex,
     setItemRef,
     trailingRef,
@@ -203,7 +204,7 @@ export function TemplateDetail({
           count={session.exercises.length}
           isVisible={isScrollActive}
           labels={session.exercises.map((exercise) => exercise.name || "Exercise")}
-          onScrub={(index) => scrollToIndex(index, "auto")}
+          onScrub={scrubToIndex}
           onSelect={scrollToIndex}
         />
       </div>

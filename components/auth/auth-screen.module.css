@@ -13,7 +13,6 @@
 }
 
 .signinCard {
-  margin-top: auto;
   padding: 20px;
   border: 1px solid transparent;
   border-radius: var(--radius-lg);
