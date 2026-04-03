@@ -10,6 +10,8 @@ import { TemplateDetailDateModal } from "@/components/workout/template-detail-da
 import type { WorkoutSession, WorkoutSetEntry } from "@/types/workout";
 
 type TemplateDetailProps = {
+  onAddExercise: () => void;
+  onAddSet: (exerciseIndex: number) => void;
   onBack: () => void;
   onCompleteWorkout: () => void;
   onDeleteWorkout: () => void;
@@ -17,8 +19,11 @@ type TemplateDetailProps = {
   isEditingSavedSession: boolean;
   isReadOnly: boolean;
   isSavedSession: boolean;
+  onRemoveExercise: (exerciseIndex: number) => void;
+  onRemoveSet: (exerciseIndex: number) => void;
   onStartEditing: () => void;
   onUpdateCompletedAt: (value: string) => void;
+  onUpdateExerciseName: (exerciseIndex: number, value: string) => void;
   onUpdateNote: (exerciseIndex: number, value: string) => void;
   onUpdateSet: (
     exerciseIndex: number,
@@ -46,6 +51,8 @@ function formatDateLabel(value: string | null) {
 }
 
 export function TemplateDetail({
+  onAddExercise,
+  onAddSet,
   onBack,
   onCompleteWorkout,
   onDeleteWorkout,
@@ -53,8 +60,11 @@ export function TemplateDetail({
   isEditingSavedSession,
   isReadOnly,
   isSavedSession,
+  onRemoveExercise,
+  onRemoveSet,
   onStartEditing,
   onUpdateCompletedAt,
+  onUpdateExerciseName,
   onUpdateNote,
   onUpdateSet,
   session,
@@ -126,9 +136,14 @@ export function TemplateDetail({
       <div className="exercise-list">
         {session.exercises.map((exercise, exerciseIndex) => (
           <ExerciseCard
+            canRemoveExercise={session.exercises.length > 1}
             exercise={exercise}
             key={`${session.id}-${exercise.exerciseId}`}
             readOnly={isReadOnly}
+            onAddSet={() => onAddSet(exerciseIndex)}
+            onRemoveExercise={() => onRemoveExercise(exerciseIndex)}
+            onRemoveSet={() => onRemoveSet(exerciseIndex)}
+            onUpdateName={(value) => onUpdateExerciseName(exerciseIndex, value)}
             onUpdateNote={(value) => onUpdateNote(exerciseIndex, value)}
             onUpdateSet={(setIndex, field, value) =>
               onUpdateSet(exerciseIndex, setIndex, field, value)
@@ -139,6 +154,9 @@ export function TemplateDetail({
 
       {!isSavedSession || isEditingSavedSession ? (
         <div className={styles.actionStack}>
+          <button className="secondary-button" type="button" onClick={onAddExercise}>
+            Add exercise
+          </button>
           <button
             className="secondary-button danger-button"
             type="button"

@@ -38,6 +38,7 @@ export type WorkoutExerciseEntry = {
   exerciseId: string;
   name: string;
   note: string;
+  templateExerciseId: string | null;
   templateNote: string;
   previousResults?: PreviousPerformance[];
   sets: WorkoutSetEntry[];

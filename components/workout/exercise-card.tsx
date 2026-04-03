@@ -1,11 +1,20 @@
 "use client";
 
+import { useState } from "react";
+
+import cardStyles from "@/components/templates/template-card.module.css";
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import styles from "@/components/workout/exercise-card.module.css";
 import type { WorkoutExerciseEntry, WorkoutSetEntry } from "@/types/workout";
 
 type ExerciseCardProps = {
   exercise: WorkoutExerciseEntry;
+  canRemoveExercise?: boolean;
   readOnly?: boolean;
+  onAddSet: () => void;
+  onRemoveExercise: () => void;
+  onRemoveSet: () => void;
+  onUpdateName: (value: string) => void;
   onUpdateNote: (value: string) => void;
   onUpdateSet: (
     setIndex: number,
@@ -16,10 +25,17 @@ type ExerciseCardProps = {
 
 export function ExerciseCard({
   exercise,
+  canRemoveExercise = true,
   readOnly = false,
+  onAddSet,
+  onRemoveExercise,
+  onRemoveSet,
+  onUpdateName,
   onUpdateNote,
   onUpdateSet,
 }: ExerciseCardProps) {
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+
   function sanitizeNumericInput(value: string) {
     if (value === "") {
       return value;
@@ -73,7 +89,18 @@ export function ExerciseCard({
     <article className={styles.card}>
       <div className={styles.header}>
         <div className={styles.heading}>
-          <h3>{exercise.name}</h3>
+          {readOnly ? (
+            <h3>{exercise.name}</h3>
+          ) : (
+            <input
+              aria-label="Exercise name"
+              className={`text-input ${styles.nameInput}`}
+              type="text"
+              value={exercise.name}
+              onChange={(event) => onUpdateName(event.target.value)}
+              placeholder="Exercise name"
+            />
+          )}
           {exercise.templateNote ? (
             <div className="exercise-subtext">{exercise.templateNote}</div>
           ) : null}
@@ -87,6 +114,17 @@ export function ExerciseCard({
             rows={2}
           />
         </div>
+        {!readOnly ? (
+          <button
+            aria-label={`Remove ${exercise.name || "exercise"}`}
+            className={`${cardStyles.iconButton} ${styles.removeExerciseButton}`}
+            disabled={!canRemoveExercise}
+            type="button"
+            onClick={() => setIsRemoveDialogOpen(true)}
+          >
+            ×
+          </button>
+        ) : null}
       </div>
 
       <div className={styles.table}>
@@ -198,6 +236,38 @@ export function ExerciseCard({
           </div>
         ))}
       </div>
+
+      {!readOnly ? (
+        <div className={styles.footerControls}>
+          <button className={cardStyles.editButton} type="button" onClick={onAddSet}>
+            Add set
+          </button>
+          <button
+            className={cardStyles.removeButton}
+            disabled={exercise.sets.length <= 1}
+            type="button"
+            onClick={onRemoveSet}
+          >
+            Remove set
+          </button>
+        </div>
+      ) : null}
+
+      {isRemoveDialogOpen ? (
+        <ConfirmationModal
+          cancelLabel="Keep exercise"
+          confirmLabel="Remove exercise"
+          confirmTone="danger"
+          message={`This will remove ${exercise.name || "this exercise"} and its sets from the current session.`}
+          onCancel={() => setIsRemoveDialogOpen(false)}
+          onConfirm={() => {
+            setIsRemoveDialogOpen(false);
+            onRemoveExercise();
+          }}
+          title="Remove exercise?"
+          titleId={`remove-exercise-${exercise.exerciseId}`}
+        />
+      ) : null}
     </article>
   );
 }

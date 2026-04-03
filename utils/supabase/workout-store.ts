@@ -264,9 +264,10 @@ export async function fetchCompletedWorkouts() {
     exercises: exerciseRows
       .filter((exercise) => exercise.session_id === session.id)
       .map((exercise) => ({
-        exerciseId: exercise.template_exercise_id ?? exercise.id,
+        exerciseId: exercise.id,
         name: exercise.name,
         note: exercise.session_note,
+        templateExerciseId: exercise.template_exercise_id,
         templateNote: exercise.template_note,
         previousResults: [],
         sets: setRows
@@ -324,7 +325,7 @@ export async function saveCompletedWorkout(
     position: index,
     session_id: sessionId,
     session_note: exercise.note,
-    template_exercise_id: exercise.exerciseId || null,
+    template_exercise_id: exercise.templateExerciseId,
     template_note: exercise.templateNote,
   }));
 

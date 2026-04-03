@@ -11,6 +11,7 @@ export const initialWorkoutHistory: WorkoutSession[] = [
         exerciseId: "11111111-1111-1111-1111-111111111112",
         name: "Bench Press",
         note: "",
+        templateExerciseId: "11111111-1111-1111-1111-111111111112",
         templateNote: "Pause briefly on the chest and keep feet planted.",
         previousResults: [
           { weight: "125", reps: "8" },
@@ -57,6 +58,7 @@ export const initialWorkoutHistory: WorkoutSession[] = [
         exerciseId: "11111111-1111-1111-1111-111111111113",
         name: "Incline Dumbbell Press",
         note: "",
+        templateExerciseId: "11111111-1111-1111-1111-111111111113",
         templateNote: "Drive elbows up together and avoid bouncing.",
         previousResults: [
           { weight: "40", reps: "10" },
@@ -111,6 +113,7 @@ export const initialWorkoutHistory: WorkoutSession[] = [
         exerciseId: "33333333-3333-3333-3333-333333333332",
         name: "Back Squat",
         note: "",
+        templateExerciseId: "33333333-3333-3333-3333-333333333332",
         templateNote: "Brace hard before each rep and keep knees out.",
         previousResults: [
           { weight: "175", reps: "5" },
@@ -157,6 +160,7 @@ export const initialWorkoutHistory: WorkoutSession[] = [
         exerciseId: "33333333-3333-3333-3333-333333333333",
         name: "Romanian Deadlift",
         note: "",
+        templateExerciseId: "33333333-3333-3333-3333-333333333333",
         templateNote: "Hinge back and keep the bar close to the legs.",
         previousResults: [
           { weight: "125", reps: "8" },

@@ -183,6 +183,11 @@ a {
   font-weight: 700;
 }
 
+.modal-cancel-button {
+  background: var(--brand);
+  color: #fffaf4;
+}
+
 .primary-button:active,
 .secondary-button:active,
 .tab-button:active {
@@ -543,6 +548,14 @@ body[data-theme="dark"] .primary-button {
   color: #1f1712;
 }
 
+html[data-theme="dark"] .modal-cancel-button,
+:root[data-theme="dark"] .modal-cancel-button,
+body[data-theme="dark"] .modal-cancel-button {
+  background: var(--brand);
+  color: #fffaf4;
+  border-color: transparent;
+}
+
 html[data-theme="dark"] .tag,
 html[data-theme="dark"] .avatar-pill,
 html[data-theme="dark"] .mini-pill,
@@ -597,6 +610,12 @@ body[data-theme="dark"] .modal-backdrop {
 
   :root:not([data-theme]) .primary-button {
     color: #1f1712;
+  }
+
+  :root:not([data-theme]) .modal-cancel-button {
+    background: var(--brand);
+    color: #fffaf4;
+    border-color: transparent;
   }
 
   :root:not([data-theme]) .tag,

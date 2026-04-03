@@ -7,9 +7,9 @@
 
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 4px;
+  gap: 10px;
 }
 
 .heading {
@@ -23,8 +23,17 @@
   margin: 0;
 }
 
+.nameInput {
+  font-weight: 700;
+}
+
 .noteInput {
   min-height: 42px;
+}
+
+.removeExerciseButton {
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .table {
@@ -117,7 +126,19 @@
   height: 13px;
 }
 
+.footerControls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 520px) {
+  .header {
+    flex-direction: column;
+  }
+
   .tableHeader,
   .row {
     grid-template-columns: 0.9fr 1.2fr 0.95fr 0.85fr 0.65fr;
@@ -136,5 +157,13 @@
 
   .spreadsheetInput {
     padding: 9px 8px;
+  }
+
+  .footerControls {
+    width: 100%;
+  }
+
+  .footerControls > * {
+    flex: 1 1 0;
   }
 }
