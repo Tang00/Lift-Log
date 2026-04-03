@@ -17,7 +17,12 @@ export function TemplateCard({
   return (
     <div className={styles.card}>
       <button className={styles.main} type="button" onClick={onSelect}>
-        <div className="exercise-name">{template.title}</div>
+        <div className={styles.copy}>
+          <div className="exercise-name">{template.title}</div>
+          {template.summary ? (
+            <div className={styles.summary}>{template.summary}</div>
+          ) : null}
+        </div>
         <div className="mini-pill">{template.exercises.length} exercises</div>
       </button>
       <button className={styles.editButton} type="button" onClick={onEdit}>

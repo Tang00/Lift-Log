@@ -75,6 +75,7 @@ export function AppShell() {
     clearInProgressWorkout,
     inProgressWorkout,
     isEditingSavedSession,
+    openBlankWorkout,
     openTemplate,
     openWorkout,
     removeExercise,
@@ -306,6 +307,10 @@ export function AppShell() {
           {screen.name === "menu" ? (
             <TemplateMenu
               inProgressWorkout={inProgressWorkout}
+              onCreateBlankWorkout={() => {
+                openBlankWorkout();
+                setScreen({ name: "detail", returnTo: "menu" });
+              }}
               templates={templates}
               onCreateTemplate={() => openTemplateEditor("create")}
               onEditTemplate={(template) => openTemplateEditor("edit", template)}

@@ -14,6 +14,16 @@ export function startWorkoutFromTemplate(
   return createSessionFromTemplate(template, completedWorkouts);
 }
 
+export function startBlankWorkout() {
+  return {
+    id: crypto.randomUUID(),
+    completedAt: null,
+    templateId: "",
+    title: "Blank Workout",
+    exercises: [createSessionExercise("Exercise 1")],
+  } satisfies WorkoutSession;
+}
+
 export function cloneSavedWorkout(workout: WorkoutSession) {
   return structuredClone(workout);
 }

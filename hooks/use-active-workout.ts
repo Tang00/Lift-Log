@@ -9,6 +9,7 @@ import {
   cloneSavedWorkout,
   removeWorkoutExercise,
   removeWorkoutSet,
+  startBlankWorkout,
   startWorkoutFromTemplate,
   updateWorkoutCompletedAt,
   updateWorkoutExerciseName,
@@ -59,6 +60,12 @@ export function useActiveWorkout({
 
   function openTemplate(template: WorkoutTemplate) {
     setInProgressWorkout(startWorkoutFromTemplate(template, completedWorkouts));
+    setSelectedHistoryWorkout(null);
+    setIsEditingSavedSession(false);
+  }
+
+  function openBlankWorkout() {
+    setInProgressWorkout(startBlankWorkout());
     setSelectedHistoryWorkout(null);
     setIsEditingSavedSession(false);
   }
@@ -146,6 +153,7 @@ export function useActiveWorkout({
     clearInProgressWorkout,
     inProgressWorkout,
     isEditingSavedSession,
+    openBlankWorkout,
     openTemplate,
     openWorkout,
     removeExercise,

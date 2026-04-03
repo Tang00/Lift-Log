@@ -8,6 +8,7 @@ import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
 
 type TemplateMenuProps = {
   inProgressWorkout: WorkoutSession | null;
+  onCreateBlankWorkout: () => void;
   onCreateTemplate: () => void;
   onEditTemplate: (template: WorkoutTemplate) => void;
   onResumeWorkout: () => void;
@@ -17,6 +18,7 @@ type TemplateMenuProps = {
 
 export function TemplateMenu({
   inProgressWorkout,
+  onCreateBlankWorkout,
   onCreateTemplate,
   onEditTemplate,
   onResumeWorkout,
@@ -25,6 +27,12 @@ export function TemplateMenu({
 }: TemplateMenuProps) {
   return (
     <div className="stack">
+      <Panel title="Start a workout">
+        <button className="primary-button" type="button" onClick={onCreateBlankWorkout}>
+          Start blank workout
+        </button>
+      </Panel>
+
       {inProgressWorkout ? (
         <Panel title="In Progress">
           <InProgressWorkoutCard

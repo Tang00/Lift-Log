@@ -72,9 +72,6 @@ export function TemplateEditorExerciseCard({
         <div className={`${styles.field} ${styles.fieldFull}`}>
           <div className="panel-header">
             <span className="field-label">Rep targets by set</span>
-            <button className={cardStyles.editButton} type="button" onClick={onAddSet}>
-              Add set
-            </button>
           </div>
           <div className={styles.repTargetList}>
             {exercise.repTargets.map((target, setIndex) => (
@@ -120,6 +117,11 @@ export function TemplateEditorExerciseCard({
                 </button>
               </div>
             ))}
+          </div>
+          <div className={styles.repTargetActions}>
+            <button className={cardStyles.editButton} type="button" onClick={onAddSet}>
+              Add set
+            </button>
           </div>
         </div>
       </div>

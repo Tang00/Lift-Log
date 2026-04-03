@@ -68,6 +68,12 @@
   font-weight: 700;
 }
 
+.repTargetActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
 @media (max-width: 520px) {
   .header {
     grid-template-columns: 36px minmax(0, 1fr);

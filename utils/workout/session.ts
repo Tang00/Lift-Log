@@ -135,7 +135,7 @@ export function createSessionExercise(name: string): WorkoutExerciseEntry {
     templateExerciseId: null,
     templateNote: "",
     previousResults: [],
-    sets: [createWorkoutSetEntry({ minReps: "8" })],
+    sets: [createWorkoutSetEntry()],
   };
 }
 
