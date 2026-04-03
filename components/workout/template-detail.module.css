@@ -52,6 +52,36 @@
   width: 100%;
 }
 
+.scrollLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0;
+  align-items: stretch;
+  min-height: calc(100dvh - 230px);
+}
+
+.scrollArea {
+  height: calc(100dvh - 230px);
+  overflow-y: auto;
+  padding-right: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+}
+
+.scrollArea::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+.scrollSnapItem {
+}
+
+.scrollFooter {
+  margin-top: 8px;
+}
+
 @media (max-width: 520px) {
   .sessionDateButton {
     font-size: 0.74rem;
@@ -64,5 +94,14 @@
   .header {
     grid-template-columns: 36px minmax(0, 1fr) auto;
     gap: 6px;
+  }
+
+  .scrollLayout {
+    gap: 0;
+    min-height: calc(100dvh - 220px);
+  }
+
+  .scrollArea {
+    height: calc(100dvh - 220px);
   }
 }

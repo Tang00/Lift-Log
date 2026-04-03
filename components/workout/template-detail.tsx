@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { useSegmentedScroll } from "@/hooks/use-segmented-scroll";
+import { SegmentedScrollNav } from "@/components/ui/segmented-scroll-nav";
 import styles from "@/components/workout/template-detail.module.css";
 import cardStyles from "@/components/templates/template-card.module.css";
 import { DeleteWorkoutModal } from "@/components/workout/delete-workout-modal";
@@ -96,6 +98,15 @@ export function TemplateDetail({
 
   const dateInputValue = formatDateInputValue(session.completedAt);
   const dateLabel = formatDateLabel(session.completedAt);
+  const {
+    activeIndex,
+    containerRef,
+    isScrollActive,
+    scrollPaddingBottom,
+    scrollToIndex,
+    setItemRef,
+    trailingRef,
+  } = useSegmentedScroll(session.exercises.length);
 
   useEffect(() => {
     setDraftDate(dateInputValue);
@@ -133,47 +144,62 @@ export function TemplateDetail({
         </div>
       </div>
 
-      <div className="exercise-list">
-        {session.exercises.map((exercise, exerciseIndex) => (
-          <ExerciseCard
-            canRemoveExercise={session.exercises.length > 1}
-            exercise={exercise}
-            key={`${session.id}-${exercise.exerciseId}`}
-            readOnly={isReadOnly}
-            onAddSet={() => onAddSet(exerciseIndex)}
-            onRemoveExercise={() => onRemoveExercise(exerciseIndex)}
-            onRemoveSet={() => onRemoveSet(exerciseIndex)}
-            onUpdateName={(value) => onUpdateExerciseName(exerciseIndex, value)}
-            onUpdateNote={(value) => onUpdateNote(exerciseIndex, value)}
-            onUpdateSet={(setIndex, field, value) =>
-              onUpdateSet(exerciseIndex, setIndex, field, value)
-            }
-          />
-        ))}
-      </div>
-
-      {!isSavedSession || isEditingSavedSession ? (
-        <div className={styles.actionStack}>
-          <button className="secondary-button" type="button" onClick={onAddExercise}>
-            Add exercise
-          </button>
-          <button
-            className="secondary-button danger-button"
-            type="button"
-            onClick={() => setIsDeleteDialogOpen(true)}
-          >
-            {isSavedSession ? "Delete workout" : "Discard workout"}
-          </button>
-          <button
-            className="primary-button"
-            style={{ display: "block", width: "100%" }}
-            type="button"
-            onClick={onCompleteWorkout}
-          >
-            {isSavedSession ? "Save changes" : `Complete workout (${completedSets}/${totalSets})`}
-          </button>
+      <div className={styles.scrollLayout}>
+        <div
+          className={styles.scrollArea}
+          ref={containerRef}
+          style={{ paddingBottom: `${scrollPaddingBottom}px` }}
+        >
+          <div className="exercise-list">
+            {session.exercises.map((exercise, exerciseIndex) => (
+              <div className={styles.scrollSnapItem} key={`${session.id}-${exercise.exerciseId}`} ref={setItemRef[exerciseIndex]}>
+                <ExerciseCard
+                  canRemoveExercise={session.exercises.length > 1}
+                  exercise={exercise}
+                  readOnly={isReadOnly}
+                  onAddSet={() => onAddSet(exerciseIndex)}
+                  onRemoveExercise={() => onRemoveExercise(exerciseIndex)}
+                  onRemoveSet={() => onRemoveSet(exerciseIndex)}
+                  onUpdateName={(value) => onUpdateExerciseName(exerciseIndex, value)}
+                  onUpdateNote={(value) => onUpdateNote(exerciseIndex, value)}
+                  onUpdateSet={(setIndex, field, value) =>
+                    onUpdateSet(exerciseIndex, setIndex, field, value)
+                  }
+                />
+              </div>
+            ))}
+          </div>
+          {!isSavedSession || isEditingSavedSession ? (
+            <div className={`${styles.actionStack} ${styles.scrollFooter}`} ref={trailingRef}>
+              <button className="secondary-button" type="button" onClick={onAddExercise}>
+                Add exercise
+              </button>
+              <button
+                className="secondary-button danger-button"
+                type="button"
+                onClick={() => setIsDeleteDialogOpen(true)}
+              >
+                {isSavedSession ? "Delete workout" : "Discard workout"}
+              </button>
+              <button
+                className="primary-button"
+                style={{ display: "block", width: "100%" }}
+                type="button"
+                onClick={onCompleteWorkout}
+              >
+                {isSavedSession ? "Save changes" : `Complete workout (${completedSets}/${totalSets})`}
+              </button>
+            </div>
+          ) : null}
         </div>
-      ) : null}
+        <SegmentedScrollNav
+          activeIndex={activeIndex}
+          count={session.exercises.length}
+          isVisible={isScrollActive}
+          labels={session.exercises.map((exercise) => exercise.name || "Exercise")}
+          onSelect={scrollToIndex}
+        />
+      </div>
 
       {isDateDialogOpen ? (
         <TemplateDetailDateModal

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { SegmentedScrollNav } from "@/components/ui/segmented-scroll-nav";
+import { useSegmentedScroll } from "@/hooks/use-segmented-scroll";
 import styles from "@/components/templates/template-editor.module.css";
 import { TemplateEditorExerciseCard } from "@/components/templates/template-editor-exercise-card";
 import type { TemplateExercise, WorkoutTemplate } from "@/types/workout";
@@ -29,6 +31,15 @@ export function TemplateEditor({
   );
 
   const isDirty = JSON.stringify(draft) !== JSON.stringify(template);
+  const {
+    activeIndex,
+    containerRef,
+    isScrollActive,
+    scrollPaddingBottom,
+    scrollToIndex,
+    setItemRef,
+    trailingRef,
+  } = useSegmentedScroll(draft.exercises.length);
 
   useEffect(() => {
     onDirtyChange?.(isDirty);
@@ -159,64 +170,81 @@ export function TemplateEditor({
         </div>
       </div>
 
-      <div className={`panel ${styles.panel}`}>
-        <div className={styles.grid}>
-          <label className={styles.field}>
-            <span className="field-label">Template name</span>
-            <input
-              className="text-input"
-              type="text"
-              value={draft.title}
-              onChange={(event) =>
-                setDraft((current) => ({ ...current, title: event.target.value }))
-              }
-              placeholder="Push Day"
-            />
-          </label>
-          <label className={styles.field}>
-            <span className="field-label">Summary</span>
-            <input
-              className="text-input"
-              type="text"
-              value={draft.summary}
-              onChange={(event) =>
-                setDraft((current) => ({ ...current, summary: event.target.value }))
-              }
-              placeholder="Chest, shoulders, triceps"
-            />
-          </label>
+      <div className={styles.scrollLayout}>
+        <div
+          className={styles.scrollArea}
+          ref={containerRef}
+          style={{ paddingBottom: `${scrollPaddingBottom}px` }}
+        >
+          <div className={`panel ${styles.panel}`}>
+            <div className={styles.grid}>
+              <label className={styles.field}>
+                <span className="field-label">Template name</span>
+                <input
+                  className="text-input"
+                  type="text"
+                  value={draft.title}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, title: event.target.value }))
+                  }
+                  placeholder="Push Day"
+                />
+              </label>
+              <label className={styles.field}>
+                <span className="field-label">Summary</span>
+                <input
+                  className="text-input"
+                  type="text"
+                  value={draft.summary}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, summary: event.target.value }))
+                  }
+                  placeholder="Chest, shoulders, triceps"
+                />
+              </label>
+            </div>
+          </div>
+          <div className="stack">
+            {draft.exercises.map((exercise, index) => (
+              <div className={styles.scrollSnapItem} key={exercise.id} ref={setItemRef[index]}>
+                <TemplateEditorExerciseCard
+                  exercise={exercise}
+                  index={index}
+                  onAddSet={() => addSet(exercise.id)}
+                  onNameChange={(value) => updateExercise(exercise.id, "name", value)}
+                  onNoteChange={(value) => updateExercise(exercise.id, "note", value)}
+                  onRemove={() => removeExercise(exercise.id)}
+                  onRemoveSet={(setIndex) => removeSet(exercise.id, setIndex)}
+                  onRepTargetChange={(setIndex, field, value) =>
+                    updateRepTarget(exercise.id, setIndex, field, value)
+                  }
+                />
+              </div>
+            ))}
+          </div>
+          <div className={`${styles.editorActions} ${styles.scrollFooter}`} ref={trailingRef}>
+            <button className="secondary-button" type="button" onClick={addExercise}>
+              Add exercise
+            </button>
+
+            <button
+              className="primary-button"
+              type="button"
+              onClick={() => onSave(draft)}
+            >
+              Save template
+            </button>
+          </div>
         </div>
+        <SegmentedScrollNav
+          activeIndex={activeIndex}
+          count={draft.exercises.length}
+          isVisible={isScrollActive}
+          labels={draft.exercises.map((exercise) => exercise.name || "Exercise")}
+          onSelect={scrollToIndex}
+        />
       </div>
 
-      <div className="stack">
-        {draft.exercises.map((exercise, index) => (
-          <TemplateEditorExerciseCard
-            key={exercise.id}
-            exercise={exercise}
-            index={index}
-            onAddSet={() => addSet(exercise.id)}
-            onNameChange={(value) => updateExercise(exercise.id, "name", value)}
-            onNoteChange={(value) => updateExercise(exercise.id, "note", value)}
-            onRemove={() => removeExercise(exercise.id)}
-            onRemoveSet={(setIndex) => removeSet(exercise.id, setIndex)}
-            onRepTargetChange={(setIndex, field, value) =>
-              updateRepTarget(exercise.id, setIndex, field, value)
-            }
-          />
-        ))}
-      </div>
-
-      <button className="secondary-button" type="button" onClick={addExercise}>
-        Add exercise
-      </button>
-
-      <button
-        className="primary-button"
-        type="button"
-        onClick={() => onSave(draft)}
-      >
-        Save template
-      </button>
     </div>
   );
 }
