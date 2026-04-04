@@ -17,6 +17,7 @@
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
   transition: width 160ms ease;
+  z-index: 4;
 }
 
 .railActive {
@@ -89,7 +90,7 @@
   white-space: nowrap;
   box-shadow: var(--shadow);
   pointer-events: none;
-  z-index: 2;
+  z-index: 5;
 }
 
 .segment:focus,
