@@ -15,7 +15,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   width: 100%;
   padding: 0;
   background: transparent;
@@ -30,8 +31,25 @@
   min-width: 0;
 }
 
-.summary {
+.title {
+  font-weight: 700;
+  min-width: 0;
+}
+
+.subtitle {
   color: var(--muted);
   font-size: 0.82rem;
   line-height: 1.35;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.action {
+  flex-shrink: 0;
 }

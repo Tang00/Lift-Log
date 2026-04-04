@@ -1,7 +1,7 @@
 "use client";
 
-import styles from "@/components/templates/template-card.module.css";
 import { CardActionButton } from "@/components/ui/actions/card-action-button";
+import { RowCard } from "@/components/ui/cards/row-card";
 import type { WorkoutTemplate } from "@/types/workout";
 
 type TemplateCardProps = {
@@ -16,19 +16,16 @@ export function TemplateCard({
   template,
 }: TemplateCardProps) {
   return (
-    <div className={styles.card}>
-      <button className={styles.main} type="button" onClick={onSelect}>
-        <div className={styles.copy}>
-          <div className="exercise-name">{template.title}</div>
-          {template.summary ? (
-            <div className={styles.summary}>{template.summary}</div>
-          ) : null}
-        </div>
-        <div className="mini-pill">{template.exercises.length} exercises</div>
-      </button>
-      <CardActionButton onClick={onEdit}>
-        Edit
-      </CardActionButton>
-    </div>
+    <RowCard
+      action={
+        <CardActionButton square onClick={onEdit}>
+          ✎
+        </CardActionButton>
+      }
+      meta={`${template.exercises.length} exercises`}
+      onSelect={onSelect}
+      subtitle={template.summary || undefined}
+      title={template.title}
+    />
   );
 }

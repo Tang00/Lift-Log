@@ -3,6 +3,7 @@
 import { InProgressWorkoutCard } from "@/components/templates/in-progress-workout-card";
 import { TemplateCard } from "@/components/templates/template-card";
 import { CardActionButton } from "@/components/ui/actions/card-action-button";
+import { RowCard } from "@/components/ui/cards/row-card";
 import styles from "@/components/templates/template-menu.module.css";
 import { Panel } from "@/components/ui/panel";
 import { ScrollablePane } from "@/components/ui/navigation/scrollable-pane";
@@ -33,10 +34,12 @@ export function TemplateMenu({
   return (
     <ScrollablePane>
       <div className={styles.stack}>
-        <Panel title="Start a workout">
-          <button className="primary-button" type="button" onClick={onCreateBlankWorkout}>
-            Start blank workout
-          </button>
+        <Panel title="Quick Start">
+          <RowCard
+            onSelect={onCreateBlankWorkout}
+            subtitle="Start from scratch"
+            title="Blank workout"
+          />
         </Panel>
 
         {inProgressWorkout ? (

@@ -33,7 +33,7 @@ export function ConfirmationModal({
         <button
           className={
             confirmTone === "danger"
-              ? "secondary-button danger-button"
+              ? "secondary-button danger-action-button"
               : "primary-button"
           }
           type="button"

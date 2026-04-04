@@ -2,13 +2,15 @@ import styles from "@/components/layout/site-header.module.css";
 
 type SiteHeaderProps = {
   accountInitial: string;
-  onSelectAccount: () => void;
+  onSelectHistory: () => void;
+  onSelectSettings: () => void;
   onSelectTemplates: () => void;
 };
 
 export function SiteHeader({
   accountInitial,
-  onSelectAccount,
+  onSelectHistory,
+  onSelectSettings,
   onSelectTemplates,
 }: SiteHeaderProps) {
   return (
@@ -20,11 +22,14 @@ export function SiteHeader({
       </div>
 
       <div className={styles.actions}>
+        <button className={styles.navButton} type="button" onClick={onSelectHistory}>
+          History
+        </button>
         <button
-          aria-label="Account"
+          aria-label="Settings"
           className={styles.accountAvatarButton}
           type="button"
-          onClick={onSelectAccount}
+          onClick={onSelectSettings}
         >
           <span className={styles.accountAvatar}>{accountInitial}</span>
         </button>

@@ -6,8 +6,9 @@ import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
 
 export type AppScreen =
   | { name: "menu" }
-  | { name: "account" }
-  | { name: "detail"; returnTo: "menu" | "account" }
+  | { name: "history" }
+  | { name: "settings" }
+  | { name: "detail"; returnTo: "menu" | "history" }
   | { name: "editor"; mode: "create" | "edit"; templateId: string };
 
 type PendingTemplateUpdate = {
@@ -15,11 +16,11 @@ type PendingTemplateUpdate = {
   workout: WorkoutSession;
 };
 
-export function screenFromReturnTarget(target: "menu" | "account"): Extract<
+export function screenFromReturnTarget(target: "menu" | "history"): Extract<
   AppScreen,
-  { name: "menu" } | { name: "account" }
+  { name: "menu" } | { name: "history" }
 > {
-  return target === "account" ? { name: "account" } : { name: "menu" };
+  return target === "history" ? { name: "history" } : { name: "menu" };
 }
 
 export function useAppFlow() {
@@ -36,12 +37,17 @@ export function useAppFlow() {
     setScreen({ name: "menu" });
   }
 
-  function openAccount() {
+  function openHistory() {
     setDraftTemplate(null);
-    setScreen({ name: "account" });
+    setScreen({ name: "history" });
   }
 
-  function openDetail(returnTo: "menu" | "account") {
+  function openSettings() {
+    setDraftTemplate(null);
+    setScreen({ name: "settings" });
+  }
+
+  function openDetail(returnTo: "menu" | "history") {
     setScreen({ name: "detail", returnTo });
   }
 
@@ -79,7 +85,8 @@ export function useAppFlow() {
     inviteEmail,
     inviteMessage,
     isInviting,
-    openAccount,
+    openHistory,
+    openSettings,
     openDetail,
     openEditor,
     openMenu,

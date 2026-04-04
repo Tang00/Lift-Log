@@ -17,7 +17,7 @@ import {
   updateWorkoutSet,
 } from "@/utils/workout/active-workout";
 
-type WorkoutSource = "menu" | "account" | null;
+type WorkoutSource = "menu" | "history" | null;
 
 type UseActiveWorkoutOptions = {
   completedWorkouts: WorkoutSession[];
@@ -29,7 +29,7 @@ function updateForSource(
   setInProgressWorkout: React.Dispatch<React.SetStateAction<WorkoutSession | null>>,
   setSelectedHistoryWorkout: React.Dispatch<React.SetStateAction<WorkoutSession | null>>,
 ) {
-  return source === "account" ? setSelectedHistoryWorkout : setInProgressWorkout;
+  return source === "history" ? setSelectedHistoryWorkout : setInProgressWorkout;
 }
 
 export function useActiveWorkout({
@@ -42,12 +42,12 @@ export function useActiveWorkout({
   const [isEditingSavedSession, setIsEditingSavedSession] = useState(false);
 
   const activeWorkout = useMemo(
-    () => (source === "account" ? selectedHistoryWorkout : inProgressWorkout),
+    () => (source === "history" ? selectedHistoryWorkout : inProgressWorkout),
     [inProgressWorkout, selectedHistoryWorkout, source],
   );
 
   useEffect(() => {
-    if (source !== "account") {
+    if (source !== "history") {
       setIsEditingSavedSession(false);
     }
   }, [source]);

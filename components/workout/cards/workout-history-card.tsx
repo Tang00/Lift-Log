@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "@/components/workout/cards/workout-history-card.module.css";
+import { RowCard } from "@/components/ui/cards/row-card";
 import type { WorkoutSession } from "@/types/workout";
 
 type WorkoutHistoryCardProps = {
@@ -24,11 +24,10 @@ export function WorkoutHistoryCard({
   workout,
 }: WorkoutHistoryCardProps) {
   return (
-    <button className={styles.item} type="button" onClick={onOpen}>
-      <div className={styles.itemMain}>
-        <div className="exercise-name">{workout.title}</div>
-        <div className={styles.date}>{formatDate(workout.completedAt)}</div>
-      </div>
-    </button>
+    <RowCard
+      meta={formatDate(workout.completedAt)}
+      onSelect={onOpen}
+      title={workout.title}
+    />
   );
 }

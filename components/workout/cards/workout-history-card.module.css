@@ -3,36 +3,3 @@
   flex-direction: column;
   gap: 8px;
 }
-
-.item {
-  width: 100%;
-  padding: 8px 0;
-  background: transparent;
-  color: var(--text);
-  text-align: left;
-}
-
-.item + .item {
-  border-top: 1px solid var(--border);
-}
-
-.itemMain {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-}
-
-.date {
-  color: var(--muted);
-  font-size: 0.84rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-@media (max-width: 520px) {
-  .date {
-    font-size: 0.72rem;
-  }
-}

@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 
-export type ThemeMode = "system" | "light" | "dark" | "sage";
+export type ThemeMode =
+  | "system"
+  | "light"
+  | "dark"
+  | "sage"
+  | "ocean"
+  | "stone"
+  | "ember"
+  | "midnight";
 
 const STORAGE_KEY = "lift-log-theme";
 
@@ -19,7 +27,11 @@ export function useThemeMode() {
       storedTheme === "system" ||
       storedTheme === "light" ||
       storedTheme === "dark" ||
-      storedTheme === "sage"
+      storedTheme === "sage" ||
+      storedTheme === "ocean" ||
+      storedTheme === "stone" ||
+      storedTheme === "ember" ||
+      storedTheme === "midnight"
     ) {
       setThemeMode(storedTheme);
     }

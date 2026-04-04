@@ -1,7 +1,8 @@
 "use client";
 
 import styles from "@/components/app-shell.module.css";
-import { AccountView } from "@/components/account/account-view";
+import { HistoryView } from "@/components/account/history-view";
+import { SettingsView } from "@/components/account/settings-view";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { SiteHeader } from "@/components/layout/site-header";
 import { TemplateEditor } from "@/components/templates/template-editor";
@@ -36,7 +37,8 @@ export function AppShell() {
     inviteEmail,
     inviteMessage,
     isInviting,
-    openAccount,
+    openHistory,
+    openSettings,
     openDetail,
     openEditor,
     openMenu,
@@ -90,7 +92,8 @@ export function AppShell() {
   const currentDraft =
     screen.name === "editor" && draftTemplate ? draftTemplate : null;
   const isFlushScreen = screen.name === "detail" || screen.name === "editor";
-  const showSiteHeader = screen.name === "menu" || screen.name === "account";
+  const showSiteHeader =
+    screen.name === "menu" || screen.name === "history" || screen.name === "settings";
 
   async function handleLogout() {
     const didSignOut = await signOut();
@@ -165,14 +168,14 @@ export function AppShell() {
       return;
     }
 
-    if (detailSource === "account") {
+    if (detailSource === "history") {
       const didDelete = await deleteWorkoutRecord(activeWorkout.id);
       if (!didDelete) {
         return;
       }
 
       clearHistoryWorkout();
-      openAccount();
+      openHistory();
       return;
     }
 
@@ -190,14 +193,14 @@ export function AppShell() {
       return;
     }
 
-    if (detailSource === "account") {
+    if (detailSource === "history") {
       clearHistoryWorkout();
     } else {
       clearInProgressWorkout();
     }
 
     setPendingTemplateUpdate(null);
-    openAccount();
+    openHistory();
   }
 
   async function handleCompleteWorkout() {
@@ -260,9 +263,13 @@ export function AppShell() {
           <div className={`screen ${styles.screen}`}>
             <SiteHeader
               accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
-              onSelectAccount={() => {
+              onSelectHistory={() => {
                 clearHistoryWorkout();
-                openAccount();
+                openHistory();
+              }}
+              onSelectSettings={() => {
+                clearHistoryWorkout();
+                openSettings();
               }}
               onSelectTemplates={() => {
                 setIsEditingSavedSession(false);
@@ -287,9 +294,13 @@ export function AppShell() {
           {showSiteHeader ? (
             <SiteHeader
               accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
-              onSelectAccount={() => {
+              onSelectHistory={() => {
                 clearHistoryWorkout();
-                openAccount();
+                openHistory();
+              }}
+              onSelectSettings={() => {
+                clearHistoryWorkout();
+                openSettings();
               }}
               onSelectTemplates={() => {
                 setIsEditingSavedSession(false);
@@ -323,8 +334,18 @@ export function AppShell() {
             />
           ) : null}
 
-          {screen.name === "account" ? (
-            <AccountView
+          {screen.name === "history" ? (
+            <HistoryView
+              onOpenWorkout={(workout) => {
+                openWorkout(workout);
+                openDetail("history");
+              }}
+              workouts={workouts}
+            />
+          ) : null}
+
+          {screen.name === "settings" ? (
+            <SettingsView
               accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
               canManageInvites={canManageInvites}
               email={session.user.email ?? ""}
@@ -333,14 +354,9 @@ export function AppShell() {
               isInviting={isInviting}
               onInviteEmailChange={setInviteEmail}
               onInviteSubmit={() => void handleInviteFriend()}
-              onOpenWorkout={(workout) => {
-                openWorkout(workout);
-                openDetail("account");
-              }}
               onSignOut={() => void handleLogout()}
               onThemeChange={setThemeMode}
               themeMode={themeMode}
-              workouts={workouts}
             />
           ) : null}
 
@@ -349,11 +365,11 @@ export function AppShell() {
               onAddExercise={addExercise}
               onAddSet={addSet}
               onBack={() => {
-                if (screen.returnTo === "account") {
+                if (screen.returnTo === "history") {
                   clearHistoryWorkout();
                 }
-                if (screen.returnTo === "account") {
-                  openAccount();
+                if (screen.returnTo === "history") {
+                  openHistory();
                   return;
                 }
                 openMenu();
@@ -362,8 +378,8 @@ export function AppShell() {
               onDeleteWorkout={() => void handleDeleteWorkout()}
               onDirtyChange={undefined}
               isEditingSavedSession={isEditingSavedSession}
-              isReadOnly={screen.returnTo === "account" && !isEditingSavedSession}
-              isSavedSession={screen.returnTo === "account"}
+              isReadOnly={screen.returnTo === "history" && !isEditingSavedSession}
+              isSavedSession={screen.returnTo === "history"}
               onRemoveExercise={removeExercise}
               onRemoveSet={removeSet}
               onStartEditing={() => setIsEditingSavedSession(true)}

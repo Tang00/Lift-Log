@@ -96,24 +96,28 @@ export function TemplateEditor({
             ))}
           </div>
           <div className={styles.scrollFooter} ref={trailingRef}>
-            <ActionGroup className={styles.editorActions}>
-              <button
-                className="secondary-button"
-                disabled={draft.exercises.length >= MAX_EXERCISES}
-                type="button"
-                onClick={addExercise}
-              >
-                Add exercise
-              </button>
-
-              <button
-                className="primary-button"
-                type="button"
-                onClick={() => onSave(draft)}
-              >
-                Save template
-              </button>
-            </ActionGroup>
+            <div className={styles.footerActions}>
+              <ActionGroup className={styles.editorActions}>
+                <button
+                  className="secondary-button"
+                  disabled={draft.exercises.length >= MAX_EXERCISES}
+                  type="button"
+                  onClick={addExercise}
+                >
+                  Add another exercise
+                </button>
+              </ActionGroup>
+              <div className="footer-action-divider" />
+              <ActionGroup className={styles.editorActions}>
+                <button
+                  className="primary-button"
+                  type="button"
+                  onClick={() => onSave(draft)}
+                >
+                  Save template
+                </button>
+              </ActionGroup>
+            </div>
           </div>
       </ScrollablePane>
 
