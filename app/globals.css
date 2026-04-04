@@ -220,6 +220,37 @@ a {
   overflow: hidden;
 }
 
+@media (pointer: coarse) {
+  html {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    min-height: 100svh;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .page-shell {
+    min-height: 100svh;
+    height: auto;
+    overflow: visible;
+  }
+
+  .mobile-frame {
+    min-height: 100svh;
+    height: auto;
+    overflow: visible;
+  }
+
+  .screen {
+    min-height: 100svh;
+    overflow: visible;
+  }
+}
+
 .panel,
 .exercise-row {
   border: 1px solid transparent;
