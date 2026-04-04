@@ -29,12 +29,12 @@ export function TemplateEditorBasics({
         </label>
         <label className={styles.field}>
           <span className="field-label">Description</span>
-          <input
-            className={`text-input ${styles.exerciseNameInput}`}
-            type="text"
+          <textarea
+            className={`text-input text-area-input ${styles.exerciseNoteInput}`}
             value={template.summary}
             onChange={(event) => onSummaryChange(event.target.value)}
             placeholder="Workout description (optional)"
+            rows={2}
           />
         </label>
       </div>

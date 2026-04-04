@@ -1,17 +1,13 @@
 .root {
-  position: relative;
   display: grid;
   grid-template-columns: 2px minmax(0, 1fr);
   gap: 0;
   align-items: stretch;
   flex: 1 1 auto;
   min-height: 0;
-  isolation: isolate;
 }
 
 .scrollArea {
-  position: relative;
-  z-index: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -21,11 +17,4 @@
 
 .singleColumn {
   grid-template-columns: minmax(0, 1fr);
-}
-
-@media (pointer: coarse) {
-  .scrollArea {
-    overflow: visible;
-    -webkit-overflow-scrolling: auto;
-  }
 }

@@ -8,14 +8,6 @@ function getItemTop(root: HTMLDivElement, item: HTMLDivElement) {
   return itemRect.top - rootRect.top + root.scrollTop;
 }
 
-function isWindowScrollMode() {
-  return typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
-}
-
-function getPageTop(item: HTMLDivElement) {
-  return item.getBoundingClientRect().top + window.scrollY;
-}
-
 export function useSegmentedScroll(itemCount: number) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -32,8 +24,6 @@ export function useSegmentedScroll(itemCount: number) {
     const root = containerRef.current;
     const lastItem = itemRefs.current[itemCount - 1] ?? null;
     const trailing = trailingRef.current;
-    const useWindowScroll = isWindowScrollMode();
-
     if (!root || !lastItem) {
       setScrollPaddingBottom(0);
       return;
@@ -59,9 +49,7 @@ export function useSegmentedScroll(itemCount: number) {
         return;
       }
 
-      const viewportHeight = useWindowScroll
-        ? Math.round(window.visualViewport?.height ?? window.innerHeight)
-        : nextRoot.clientHeight;
+      const viewportHeight = nextRoot.clientHeight;
       const lastItemHeight = nextLastItem.offsetHeight;
       const trailingHeight = getOuterHeight(trailingRef.current);
       const nextPadding = Math.max(viewportHeight - lastItemHeight - trailingHeight, 0);
@@ -72,28 +60,20 @@ export function useSegmentedScroll(itemCount: number) {
     updatePadding();
 
     const observer = new ResizeObserver(updatePadding);
-    if (!useWindowScroll) {
-      observer.observe(root);
-    }
+    observer.observe(root);
     observer.observe(lastItem);
 
     if (trailing) {
       observer.observe(trailing);
     }
 
-    window.addEventListener("resize", updatePadding);
-    window.visualViewport?.addEventListener("resize", updatePadding);
-
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize", updatePadding);
-      window.visualViewport?.removeEventListener("resize", updatePadding);
     };
   }, [itemCount]);
 
   useEffect(() => {
     const root = containerRef.current;
-    const useWindowScroll = isWindowScrollMode();
     if (!root) {
       return;
     }
@@ -108,7 +88,7 @@ export function useSegmentedScroll(itemCount: number) {
         return;
       }
 
-      const rootScrollTop = useWindowScroll ? window.scrollY : nextRoot.scrollTop;
+      const rootScrollTop = nextRoot.scrollTop;
       const activationOffset = 12;
       let nextIndex = 0;
 
@@ -117,7 +97,7 @@ export function useSegmentedScroll(itemCount: number) {
           return;
         }
 
-        const itemTop = useWindowScroll ? getPageTop(item) : getItemTop(nextRoot, item);
+        const itemTop = getItemTop(nextRoot, item);
         if (itemTop <= rootScrollTop + activationOffset) {
           nextIndex = index;
         }
@@ -135,11 +115,10 @@ export function useSegmentedScroll(itemCount: number) {
     }
 
     updateActiveFromScroll();
-    const scrollTarget = useWindowScroll ? window : root;
-    scrollTarget.addEventListener("scroll", handleScroll, { passive: true });
+    root.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      scrollTarget.removeEventListener("scroll", handleScroll);
+      root.removeEventListener("scroll", handleScroll);
       if (frameId !== 0) {
         window.cancelAnimationFrame(frameId);
       }
@@ -155,7 +134,6 @@ export function useSegmentedScroll(itemCount: number) {
   );
 
   function getScrollTopForIndex(index: number) {
-    const useWindowScroll = isWindowScrollMode();
     const root = containerRef.current;
     const item = itemRefs.current[index];
 
@@ -163,23 +141,14 @@ export function useSegmentedScroll(itemCount: number) {
       return null;
     }
 
-    return Math.max(useWindowScroll ? getPageTop(item) : getItemTop(root, item), 0);
+    return Math.max(getItemTop(root, item), 0);
   }
 
   function scrollToIndex(index: number, behavior: ScrollBehavior = "smooth") {
-    const useWindowScroll = isWindowScrollMode();
     const root = containerRef.current;
     const nextTop = getScrollTopForIndex(index);
 
     if (!root || nextTop == null) {
-      return;
-    }
-
-    if (useWindowScroll) {
-      window.scrollTo({
-        top: nextTop,
-        behavior,
-      });
       return;
     }
 
