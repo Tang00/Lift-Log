@@ -1,0 +1,49 @@
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-strong);
+  padding: 14px;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.headingCompact {
+  gap: 3px;
+}
+
+.removeAction {
+  align-self: start;
+  justify-self: end;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.footerControls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 520px) {
+  .footerControls {
+    width: 100%;
+  }
+
+  .footerControls > * {
+    flex: 1 1 0;
+  }
+}

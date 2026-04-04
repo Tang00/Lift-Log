@@ -2,6 +2,7 @@
 
 import styles from "@/components/templates/template-editor.module.css";
 import { CardActionButton } from "@/components/ui/actions/card-action-button";
+import { ExerciseCardFrame } from "@/components/ui/cards/exercise-card-frame";
 import type { TemplateExercise } from "@/types/workout";
 import { clampIntegerString, MAX_REPS } from "@/utils/workout/limits";
 
@@ -41,9 +42,23 @@ export function TemplateEditorExerciseCard({
   }
 
   return (
-    <article className={styles.exerciseCard}>
-      <div className={styles.exerciseHeader}>
-        <div className={styles.exerciseHeading}>
+    <ExerciseCardFrame
+      footer={
+        <>
+          <CardActionButton disabled={!canAddSet} onClick={onAddSet}>
+            Add set
+          </CardActionButton>
+          <CardActionButton
+            disabled={exercise.repTargets.length <= 1}
+            tone="danger"
+            onClick={() => onRemoveSet(exercise.repTargets.length - 1)}
+          >
+            Remove set
+          </CardActionButton>
+        </>
+      }
+      heading={
+        <>
           <div className={styles.exerciseIndex}>Exercise {index + 1}</div>
           <input
             className={`text-input ${styles.exerciseNameInput}`}
@@ -59,17 +74,19 @@ export function TemplateEditorExerciseCard({
             placeholder="Shown under the exercise name during the workout"
             rows={2}
           />
-        </div>
+        </>
+      }
+      removeAction={
         <CardActionButton
           aria-label={`Remove ${exercise.name || "exercise"}`}
-          className={styles.removeExerciseButton}
           square
           tone="danger"
           onClick={onRemove}
         >
           ×
         </CardActionButton>
-      </div>
+      }
+    >
 
       <div className={styles.repTable}>
         <div className={styles.repTableHeader}>
@@ -111,19 +128,6 @@ export function TemplateEditorExerciseCard({
           </div>
         ))}
       </div>
-
-      <div className={styles.footerControls}>
-        <CardActionButton disabled={!canAddSet} onClick={onAddSet}>
-          Add set
-        </CardActionButton>
-        <CardActionButton
-          disabled={exercise.repTargets.length <= 1}
-          tone="danger"
-          onClick={() => onRemoveSet(exercise.repTargets.length - 1)}
-        >
-          Remove set
-        </CardActionButton>
-      </div>
-    </article>
+    </ExerciseCardFrame>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { CardActionButton } from "@/components/ui/actions/card-action-button";
+import { ExerciseCardFrame } from "@/components/ui/cards/exercise-card-frame";
 import { ConfirmationModal } from "@/components/ui/overlays/confirmation-modal";
 import styles from "@/components/workout/cards/exercise-card.module.css";
 import type { WorkoutExerciseEntry, WorkoutSetEntry } from "@/types/workout";
@@ -78,9 +79,29 @@ export function ExerciseCard({
   }
 
   return (
-    <article className={styles.card}>
-      <div className={styles.header}>
-        <div className={styles.heading}>
+    <>
+      <ExerciseCardFrame
+      footer={
+        !readOnly ? (
+          <>
+            <CardActionButton
+              disabled={exercise.sets.length >= MAX_SETS}
+              onClick={onAddSet}
+            >
+              Add set
+            </CardActionButton>
+            <CardActionButton
+              disabled={exercise.sets.length <= 1}
+              tone="danger"
+              onClick={onRemoveSet}
+            >
+              Remove set
+            </CardActionButton>
+          </>
+        ) : undefined
+      }
+      heading={
+        <>
           {readOnly ? (
             <h3>{exercise.name}</h3>
           ) : (
@@ -105,19 +126,22 @@ export function ExerciseCard({
             placeholder="Notes"
             rows={2}
           />
-        </div>
-        {!readOnly ? (
+        </>
+      }
+      headingCompact
+      removeAction={
+        !readOnly ? (
           <CardActionButton
             aria-label={`Remove ${exercise.name || "exercise"}`}
-            className={styles.removeExerciseButton}
             disabled={!canRemoveExercise}
             square
             onClick={() => setIsRemoveDialogOpen(true)}
           >
             ×
           </CardActionButton>
-        ) : null}
-      </div>
+        ) : undefined
+      }
+    >
 
       <div className={styles.table}>
         <div className={styles.tableHeader}>
@@ -213,25 +237,7 @@ export function ExerciseCard({
           </div>
         ))}
       </div>
-
-      {!readOnly ? (
-        <div className={styles.footerControls}>
-          <CardActionButton
-            disabled={exercise.sets.length >= MAX_SETS}
-            onClick={onAddSet}
-          >
-            Add set
-          </CardActionButton>
-          <CardActionButton
-            disabled={exercise.sets.length <= 1}
-            tone="danger"
-            onClick={onRemoveSet}
-          >
-            Remove set
-          </CardActionButton>
-        </div>
-      ) : null}
-
+      </ExerciseCardFrame>
       {isRemoveDialogOpen ? (
         <ConfirmationModal
           cancelLabel="Keep exercise"
@@ -247,6 +253,6 @@ export function ExerciseCard({
           titleId={`remove-exercise-${exercise.exerciseId}`}
         />
       ) : null}
-    </article>
+    </>
   );
 }

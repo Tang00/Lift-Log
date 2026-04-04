@@ -43,43 +43,65 @@
   gap: 8px;
 }
 
-.fieldFull {
-  grid-column: 1 / -1;
-}
-
-.repTargetList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.repTargetRow {
-  display: grid;
-  grid-template-columns: 64px 1fr 1fr auto;
-  gap: 8px;
-  align-items: end;
-}
-
-.repTargetLabel {
+.exerciseIndex {
   font-weight: 700;
-}
-
-.repTargetField {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.repTargetCaption {
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
+}
+
+.exerciseNameInput {
   font-weight: 700;
 }
 
-.repTargetActions {
+.exerciseNoteInput {
+  min-height: 42px;
+}
+
+.repTable {
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
   margin-top: 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-strong);
+}
+
+.repTableHeader,
+.repTableRow {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+}
+
+.repTableHeader {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.repTableRow + .repTableRow {
+  border-top: 1px solid var(--border);
+}
+
+.repSetIndex {
+  font-weight: 800;
+}
+
+.repInput {
+  min-width: 0;
+  border-radius: 8px;
+  background: var(--surface-strong);
+  color: var(--text);
+  text-align: left;
+  padding: 8px;
+  font-size: 16px;
 }
 
 .scrollSnapItem {
@@ -104,5 +126,15 @@
   .header {
     grid-template-columns: 36px minmax(0, 1fr);
     gap: 6px;
+  }
+
+  .repTableHeader,
+  .repTableRow {
+    gap: 6px;
+    padding: 10px;
+  }
+
+  .repTableHeader {
+    font-size: 0.7rem;
   }
 }

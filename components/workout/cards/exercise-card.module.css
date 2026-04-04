@@ -1,42 +1,10 @@
-.card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-strong);
-  padding: 14px;
-}
-
-.header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 10px;
-}
-
-.heading {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  flex: 1;
-  min-width: 0;
-}
-
-.heading h3 {
-  margin: 0;
-}
-
 .nameInput {
+  margin: 0;
   font-weight: 700;
 }
 
 .noteInput {
   min-height: 42px;
-}
-
-.removeExerciseButton {
-  align-self: start;
-  justify-self: end;
-  flex-shrink: 0;
-  margin-top: 1px;
 }
 
 .table {
@@ -163,14 +131,6 @@
   cursor: default;
 }
 
-.footerControls {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
 @media (max-width: 520px) {
   .tableHeader,
   .row {
@@ -190,13 +150,5 @@
 
   .spreadsheetInput {
     padding: 9px 8px;
-  }
-
-  .footerControls {
-    width: 100%;
-  }
-
-  .footerControls > * {
-    flex: 1 1 0;
   }
 }
