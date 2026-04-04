@@ -1,9 +1,14 @@
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding-top: 2px;
   padding-bottom: 4px;
+  background: var(--bg);
 }
 
 .left,
