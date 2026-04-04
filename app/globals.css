@@ -245,6 +245,7 @@ a {
   }
 
   .screen {
+    display: block;
     min-height: 0;
     overflow: visible;
   }

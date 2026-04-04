@@ -22,3 +22,10 @@
 .singleColumn {
   grid-template-columns: minmax(0, 1fr);
 }
+
+@media (pointer: coarse) {
+  .scrollArea {
+    overflow: visible;
+    -webkit-overflow-scrolling: auto;
+  }
+}

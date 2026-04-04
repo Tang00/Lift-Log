@@ -19,6 +19,12 @@
   background: var(--bg);
 }
 
+@supports (top: env(safe-area-inset-top)) {
+  .header {
+    top: env(safe-area-inset-top);
+  }
+}
+
 .title {
   display: flex;
   flex-direction: column;
@@ -58,10 +64,18 @@
 
 .exerciseNameInput {
   font-weight: 700;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.35;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .exerciseNoteInput {
   min-height: 42px;
+  font-family: var(--font-sans);
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .repTable {
@@ -109,6 +123,9 @@
   text-align: left;
   padding: 8px;
   font-size: 16px;
+  font-family: var(--font-sans);
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .contentStack {
@@ -163,5 +180,11 @@
 
   .repTableHeader {
     font-size: 0.7rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .root {
+    display: block;
   }
 }

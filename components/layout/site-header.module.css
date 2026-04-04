@@ -11,6 +11,12 @@
   background: var(--bg);
 }
 
+@supports (top: env(safe-area-inset-top)) {
+  .header {
+    top: env(safe-area-inset-top);
+  }
+}
+
 .left,
 .actions {
   display: flex;

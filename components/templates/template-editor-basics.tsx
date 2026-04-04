@@ -20,7 +20,7 @@ export function TemplateEditorBasics({
         <label className={styles.field}>
           <span className="field-label">Template name</span>
           <input
-            className="text-input"
+            className={`text-input ${styles.exerciseNameInput}`}
             type="text"
             value={template.title}
             onChange={(event) => onTitleChange(event.target.value)}
@@ -30,7 +30,7 @@ export function TemplateEditorBasics({
         <label className={styles.field}>
           <span className="field-label">Description</span>
           <input
-            className="text-input"
+            className={`text-input ${styles.exerciseNameInput}`}
             type="text"
             value={template.summary}
             onChange={(event) => onSummaryChange(event.target.value)}

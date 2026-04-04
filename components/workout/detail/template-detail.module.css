@@ -19,6 +19,12 @@
   background: var(--bg);
 }
 
+@supports (top: env(safe-area-inset-top)) {
+  .header {
+    top: env(safe-area-inset-top);
+  }
+}
+
 .headerActions {
   display: flex;
   justify-content: flex-end;
@@ -76,5 +82,11 @@
     grid-template-columns: 32px minmax(0, 1fr) auto;
     gap: 16px;
     padding: 4px 8px 3px 0;
+  }
+}
+
+@media (pointer: coarse) {
+  .root {
+    display: block;
   }
 }
