@@ -17,8 +17,8 @@
 }
 
 .danger {
-  background: var(--accent-soft);
-  color: var(--brand-strong);
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .square {

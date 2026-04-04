@@ -135,6 +135,7 @@ export function ExerciseCard({
             aria-label={`Remove ${exercise.name || "exercise"}`}
             disabled={!canRemoveExercise}
             square
+            tone="danger"
             onClick={() => setIsRemoveDialogOpen(true)}
           >
             ×

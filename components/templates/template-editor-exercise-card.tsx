@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+
 import styles from "@/components/templates/template-editor.module.css";
 import { CardActionButton } from "@/components/ui/actions/card-action-button";
 import { ExerciseCardFrame } from "@/components/ui/cards/exercise-card-frame";
+import { ConfirmationModal } from "@/components/ui/overlays/confirmation-modal";
 import type { TemplateExercise } from "@/types/workout";
 import { clampIntegerString, MAX_REPS } from "@/utils/workout/limits";
 
@@ -33,6 +36,8 @@ export function TemplateEditorExerciseCard({
   onRemoveSet,
   onRepTargetChange,
 }: TemplateEditorExerciseCardProps) {
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+
   function sanitizeIntegerInput(value: string) {
     if (value === "" || /^\d+$/.test(value)) {
       return clampIntegerString(value, MAX_REPS);
@@ -42,6 +47,7 @@ export function TemplateEditorExerciseCard({
   }
 
   return (
+    <>
     <ExerciseCardFrame
       footer={
         <>
@@ -65,13 +71,13 @@ export function TemplateEditorExerciseCard({
             type="text"
             value={exercise.name}
             onChange={(event) => onNameChange(event.target.value)}
-            placeholder="Bench Press"
+            placeholder="Exercise name"
           />
           <textarea
             className={`text-input text-area-input ${styles.exerciseNoteInput}`}
             value={exercise.note}
             onChange={(event) => onNoteChange(event.target.value)}
-            placeholder="Shown under the exercise name during the workout"
+            placeholder="Exercise details (optional)"
             rows={2}
           />
         </>
@@ -81,7 +87,7 @@ export function TemplateEditorExerciseCard({
           aria-label={`Remove ${exercise.name || "exercise"}`}
           square
           tone="danger"
-          onClick={onRemove}
+          onClick={() => setIsRemoveDialogOpen(true)}
         >
           ×
         </CardActionButton>
@@ -129,5 +135,21 @@ export function TemplateEditorExerciseCard({
         ))}
       </div>
     </ExerciseCardFrame>
+    {isRemoveDialogOpen ? (
+      <ConfirmationModal
+        cancelLabel="Keep exercise"
+        confirmLabel="Remove exercise"
+        confirmTone="danger"
+        message={`This will remove ${exercise.name || "this exercise"} and its planned sets from the template.`}
+        onCancel={() => setIsRemoveDialogOpen(false)}
+        onConfirm={() => {
+          setIsRemoveDialogOpen(false);
+          onRemove();
+        }}
+        title="Remove exercise?"
+        titleId={`remove-template-exercise-${exercise.id}`}
+      />
+    ) : null}
+    </>
   );
 }

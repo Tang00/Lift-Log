@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import styles from "@/components/app-shell.module.css";
 import { HistoryView } from "@/components/account/history-view";
 import { SettingsView } from "@/components/account/settings-view";
@@ -7,6 +9,7 @@ import { AuthScreen } from "@/components/auth/auth-screen";
 import { SiteHeader } from "@/components/layout/site-header";
 import { TemplateEditor } from "@/components/templates/template-editor";
 import { TemplateMenu } from "@/components/templates/template-menu";
+import { ConfirmationModal } from "@/components/ui/overlays/confirmation-modal";
 import { LoadingModal } from "@/components/ui/overlays/loading-modal";
 import { TemplateDetail } from "@/components/workout/detail/template-detail";
 import { UpdateTemplateModal } from "@/components/workout/modals/update-template-modal";
@@ -19,7 +22,14 @@ import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
 import { MAX_TEMPLATES } from "@/utils/workout/limits";
 import { createEmptyTemplate, normalizeTemplate, sessionDiffersFromTemplate } from "@/utils/workout/session";
 
+type PendingWorkoutReplacement =
+  | { kind: "blank" }
+  | { kind: "template"; template: WorkoutTemplate }
+  | null;
+
 export function AppShell() {
+  const [pendingWorkoutReplacement, setPendingWorkoutReplacement] =
+    useState<PendingWorkoutReplacement>(null);
   const {
     authMessage,
     email,
@@ -151,6 +161,34 @@ export function AppShell() {
 
     setIsEditingSavedSession(false);
     openEditor(mode, nextTemplate);
+  }
+
+  function startBlankWorkout() {
+    openBlankWorkout();
+    openDetail("menu");
+  }
+
+  function startTemplateWorkout(template: WorkoutTemplate) {
+    openTemplate(template);
+    openDetail("menu");
+  }
+
+  function requestBlankWorkout() {
+    if (inProgressWorkout) {
+      setPendingWorkoutReplacement({ kind: "blank" });
+      return;
+    }
+
+    startBlankWorkout();
+  }
+
+  function requestTemplateWorkout(template: WorkoutTemplate) {
+    if (inProgressWorkout) {
+      setPendingWorkoutReplacement({ kind: "template", template });
+      return;
+    }
+
+    startTemplateWorkout(template);
   }
 
   async function handleSaveTemplate(template: WorkoutTemplate) {
@@ -312,10 +350,7 @@ export function AppShell() {
           {screen.name === "menu" ? (
             <TemplateMenu
               inProgressWorkout={inProgressWorkout}
-              onCreateBlankWorkout={() => {
-                openBlankWorkout();
-                openDetail("menu");
-              }}
+              onCreateBlankWorkout={requestBlankWorkout}
               templates={templates}
               onCreateTemplate={() => openTemplateEditor("create")}
               onEditTemplate={(template) => openTemplateEditor("edit", template)}
@@ -327,10 +362,7 @@ export function AppShell() {
                 clearHistoryWorkout();
                 openDetail("menu");
               }}
-              onSelectTemplate={(template) => {
-                openTemplate(template);
-                openDetail("menu");
-              }}
+              onSelectTemplate={requestTemplateWorkout}
             />
           ) : null}
 
@@ -406,6 +438,32 @@ export function AppShell() {
 
           {isSavingTemplate ? <LoadingModal title="Saving template" /> : null}
           {isSavingWorkout ? <LoadingModal title="Saving workout" /> : null}
+          {pendingWorkoutReplacement ? (
+            <ConfirmationModal
+              cancelLabel="Keep current workout"
+              confirmLabel="Start new workout"
+              confirmTone="danger"
+              message="Your current in-progress workout will be replaced and any unsaved progress will be lost."
+              onCancel={() => setPendingWorkoutReplacement(null)}
+              onConfirm={() => {
+                const next = pendingWorkoutReplacement;
+                setPendingWorkoutReplacement(null);
+
+                if (!next) {
+                  return;
+                }
+
+                if (next.kind === "blank") {
+                  startBlankWorkout();
+                  return;
+                }
+
+                startTemplateWorkout(next.template);
+              }}
+              title="Start a different workout?"
+              titleId="replace-workout-title"
+            />
+          ) : null}
           {pendingTemplateUpdate && !isSavingWorkout && !isSavingTemplate ? (
             <UpdateTemplateModal
               onClose={() => setPendingTemplateUpdate(null)}

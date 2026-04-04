@@ -9,7 +9,7 @@
   height: 100%;
   padding: 0;
   margin: 0;
-  width: 2px;
+  width: 18px;
   overflow: visible;
   touch-action: auto;
   user-select: none;
@@ -20,7 +20,7 @@
 }
 
 .railActive {
-  width: 24px;
+  width: 18px;
 }
 
 .segmentWrap {
@@ -30,7 +30,6 @@
   min-height: 10px;
   display: flex;
   align-items: stretch;
-  margin-right: -16px;
 }
 
 .segment {
@@ -61,7 +60,7 @@
   left: 0;
   width: 2px;
   border-radius: 999px;
-  background: var(--accent-soft);
+  background: var(--border-strong);
   transition: width 160ms ease, background 160ms ease;
 }
 
@@ -76,14 +75,14 @@
 .label {
   position: absolute;
   top: 50%;
-  left: calc(100% + 8px);
+  left: calc(100% + 1px);
   transform: translateY(-50%);
   max-width: 180px;
-  padding: 5px 8px;
-  border: 1px solid var(--border-strong);
+  padding: 4px 7px;
+  border: 1px solid transparent;
   border-radius: 8px;
-  background: var(--surface-strong);
-  color: var(--text);
+  background: var(--brand);
+  color: var(--brand-contrast);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.2;
@@ -105,6 +104,7 @@
   }
 
   .label {
-    display: none;
+    left: calc(100% + 1px);
+    font-size: 0.68rem;
   }
 }

@@ -24,17 +24,17 @@ export function TemplateEditorBasics({
             type="text"
             value={template.title}
             onChange={(event) => onTitleChange(event.target.value)}
-            placeholder="Push Day"
+            placeholder="Workout template"
           />
         </label>
         <label className={styles.field}>
-          <span className="field-label">Summary</span>
+          <span className="field-label">Description</span>
           <input
             className="text-input"
             type="text"
             value={template.summary}
             onChange={(event) => onSummaryChange(event.target.value)}
-            placeholder="Chest, shoulders, triceps"
+            placeholder="Workout description (optional)"
           />
         </label>
       </div>

@@ -19,8 +19,7 @@ export function SegmentedScrollNav({
   onSelect,
 }: SegmentedScrollNavProps) {
   const hideTimeoutRef = useRef<number | null>(null);
-  const [isInteracting, setIsInteracting] = useState(false);
-  const [labelIndex, setLabelIndex] = useState<number | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   function clearHideTimeout() {
     if (hideTimeoutRef.current == null) {
@@ -31,11 +30,11 @@ export function SegmentedScrollNav({
     hideTimeoutRef.current = null;
   }
 
-  function pulseRail() {
+  function expandRail() {
     clearHideTimeout();
-    setIsInteracting(true);
+    setIsExpanded(true);
     hideTimeoutRef.current = window.setTimeout(() => {
-      setIsInteracting(false);
+      setIsExpanded(false);
       hideTimeoutRef.current = null;
     }, 1600);
   }
@@ -45,28 +44,14 @@ export function SegmentedScrollNav({
   return (
     <nav
       aria-label="Exercise navigation"
-      className={`${styles.rail} ${isInteracting ? styles.railActive : ""}`}
+      className={`${styles.rail} ${isExpanded ? styles.railActive : ""}`}
       onBlur={() => {
         clearHideTimeout();
-        setIsInteracting(false);
-        setLabelIndex(null);
-      }}
-      onFocus={() => pulseRail()}
-      onMouseEnter={() => pulseRail()}
-      onMouseLeave={() => {
-        clearHideTimeout();
-        setIsInteracting(false);
-        setLabelIndex(null);
-      }}
-      onPointerDown={() => {
-        pulseRail();
-      }}
-      onPointerUp={() => {
-        pulseRail();
+        setIsExpanded(false);
       }}
       onPointerCancel={() => {
         clearHideTimeout();
-        setIsInteracting(false);
+        setIsExpanded(false);
       }}
     >
       {Array.from({ length: count }, (_, index) => (
@@ -76,27 +61,17 @@ export function SegmentedScrollNav({
             aria-pressed={index === activeIndex}
             className={`${styles.segment} ${index === activeIndex ? styles.segmentActive : ""}`}
             type="button"
-            onBlur={() => {
-              setLabelIndex((current) => (current === index ? null : current));
-            }}
             onClick={() => {
-              pulseRail();
-              setLabelIndex(index);
+              if (!isExpanded) {
+                expandRail();
+                return;
+              }
+
+              expandRail();
               onSelect(index);
             }}
-            onFocus={() => {
-              pulseRail();
-              setLabelIndex(index);
-            }}
-            onMouseEnter={() => {
-              pulseRail();
-              setLabelIndex(index);
-            }}
-            onMouseLeave={() => {
-              setLabelIndex((current) => (current === index ? null : current));
-            }}
           />
-          {labelIndex === index && labels?.[index] ? (
+          {isExpanded && labels?.[index] ? (
             <SegmentedScrollLabel label={labels[index]} />
           ) : null}
         </div>

@@ -407,12 +407,12 @@ a {
 }
 
 .back-arrow {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
   background: var(--surface);
   color: var(--text);
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   font-weight: 800;
 }
 

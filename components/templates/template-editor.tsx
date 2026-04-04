@@ -67,6 +67,7 @@ export function TemplateEditor({
         scrollPaddingBottom={scrollPaddingBottom}
         scrollRef={containerRef}
       >
+        <div className={styles.contentStack}>
           <TemplateEditorBasics
             onSummaryChange={(value) =>
               setDraft((current) => ({ ...current, summary: value }))
@@ -76,7 +77,7 @@ export function TemplateEditor({
             }
             template={draft}
           />
-          <div className="stack">
+          <div className={styles.exerciseStack}>
             {draft.exercises.map((exercise, index) => (
               <div className={styles.scrollSnapItem} key={exercise.id} ref={setItemRef[index]}>
                 <TemplateEditorExerciseCard
@@ -119,6 +120,7 @@ export function TemplateEditor({
               </ActionGroup>
             </div>
           </div>
+        </div>
       </ScrollablePane>
 
     </div>
