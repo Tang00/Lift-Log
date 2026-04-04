@@ -2,10 +2,10 @@
 
 import { InProgressWorkoutCard } from "@/components/templates/in-progress-workout-card";
 import { TemplateCard } from "@/components/templates/template-card";
-import cardStyles from "@/components/templates/template-card.module.css";
+import { CardActionButton } from "@/components/ui/actions/card-action-button";
 import styles from "@/components/templates/template-menu.module.css";
 import { Panel } from "@/components/ui/panel";
-import { ScrollablePane } from "@/components/ui/scrollable-pane";
+import { ScrollablePane } from "@/components/ui/navigation/scrollable-pane";
 import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
 import { MAX_TEMPLATES } from "@/utils/workout/limits";
 
@@ -50,15 +50,14 @@ export function TemplateMenu({
 
         <Panel
           actions={
-            <button
+            <CardActionButton
               aria-label="Create template"
-              className={cardStyles.iconButton}
               disabled={hasReachedTemplateLimit}
-              type="button"
+              square
               onClick={onCreateTemplate}
             >
               +
-            </button>
+            </CardActionButton>
           }
           title="Templates"
         >

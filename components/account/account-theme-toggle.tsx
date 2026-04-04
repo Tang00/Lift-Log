@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "@/components/account/account-view.module.css";
-import type { ThemeMode } from "@/hooks/use-theme-mode";
+import type { ThemeMode } from "@/hooks/ui/use-theme-mode";
 
 type AccountThemeToggleProps = {
   onThemeChange: (value: ThemeMode) => void;

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-import styles from "@/components/ui/segmented-scroll-nav.module.css";
+import styles from "@/components/ui/navigation/segmented-scroll-nav.module.css";
 
 type SegmentedScrollNavProps = {
   activeIndex: number;

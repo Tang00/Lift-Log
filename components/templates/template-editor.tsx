@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-
-import { SegmentedScrollNav } from "@/components/ui/segmented-scroll-nav";
-import { ActionGroup } from "@/components/ui/action-group";
-import { ScrollablePane } from "@/components/ui/scrollable-pane";
-import { useSegmentedScroll } from "@/hooks/use-segmented-scroll";
+import { SegmentedScrollNav } from "@/components/ui/navigation/segmented-scroll-nav";
+import { ActionGroup } from "@/components/ui/actions/action-group";
+import { ScrollablePane } from "@/components/ui/navigation/scrollable-pane";
+import { useSegmentedScroll } from "@/hooks/ui/use-segmented-scroll";
+import { useTemplateEditorDraft } from "@/hooks/templates/use-template-editor-draft";
+import { TemplateEditorBasics } from "@/components/templates/template-editor-basics";
 import styles from "@/components/templates/template-editor.module.css";
 import { TemplateEditorExerciseCard } from "@/components/templates/template-editor-exercise-card";
-import type { TemplateExercise, WorkoutTemplate } from "@/types/workout";
-import { clampIntegerString, MAX_EXERCISES, MAX_REPS, MAX_SETS } from "@/utils/workout/limits";
+import { TemplateEditorHeader } from "@/components/templates/template-editor-header";
+import type { WorkoutTemplate } from "@/types/workout";
+import { MAX_EXERCISES, MAX_SETS } from "@/utils/workout/limits";
 
 type TemplateEditorProps = {
   mode: "create" | "edit";
@@ -26,14 +27,21 @@ export function TemplateEditor({
   onSave,
   template,
 }: TemplateEditorProps) {
-  const [draft, setDraft] = useState<WorkoutTemplate>(template);
-
-  const heading = useMemo(
-    () => (mode === "create" ? "Create template" : "Edit template"),
-    [mode],
-  );
-
-  const isDirty = JSON.stringify(draft) !== JSON.stringify(template);
+  const {
+    addExercise,
+    addSet,
+    draft,
+    heading,
+    removeExercise,
+    removeSet,
+    setDraft,
+    updateExercise,
+    updateRepTarget,
+  } = useTemplateEditorDraft({
+    mode,
+    onDirtyChange,
+    template,
+  });
   const {
     activeIndex,
     containerRef,
@@ -45,140 +53,9 @@ export function TemplateEditor({
     trailingRef,
   } = useSegmentedScroll(draft.exercises.length);
 
-  useEffect(() => {
-    onDirtyChange?.(isDirty);
-  }, [isDirty, onDirtyChange]);
-
-  useEffect(() => {
-    setDraft(template);
-  }, [template]);
-
-  function updateExercise(
-    exerciseId: string,
-    field: keyof TemplateExercise,
-    value: string | number | boolean,
-  ) {
-    setDraft((current) => ({
-      ...current,
-      exercises: current.exercises.map((exercise) =>
-        exercise.id === exerciseId ? { ...exercise, [field]: value } : exercise,
-      ),
-    }));
-  }
-
-  function addExercise() {
-    if (draft.exercises.length >= MAX_EXERCISES) {
-      return;
-    }
-
-    setDraft((current) => ({
-      ...current,
-      exercises: [
-        ...current.exercises,
-        {
-          id: crypto.randomUUID(),
-          name: "",
-          note: "",
-          expectedSets: 1,
-          repTargets: [{ minReps: "8", maxReps: "" }],
-          previousResults: [],
-        },
-      ],
-    }));
-  }
-
-  function addSet(exerciseId: string) {
-    setDraft((current) => ({
-      ...current,
-      exercises: current.exercises.map((exercise) => {
-        if (exercise.id !== exerciseId || exercise.repTargets.length >= MAX_SETS) {
-          return exercise;
-        }
-
-        const lastTarget = exercise.repTargets[exercise.repTargets.length - 1];
-        const nextTargets = [
-          ...exercise.repTargets,
-          {
-            minReps: lastTarget?.minReps ?? "",
-            maxReps: lastTarget?.maxReps ?? "",
-          },
-        ];
-
-        return {
-          ...exercise,
-          expectedSets: nextTargets.length,
-          repTargets: nextTargets,
-        };
-      }),
-    }));
-  }
-
-  function removeSet(exerciseId: string, setIndex: number) {
-    setDraft((current) => ({
-      ...current,
-      exercises: current.exercises.map((exercise) => {
-        if (exercise.id !== exerciseId || exercise.repTargets.length <= 1) {
-          return exercise;
-        }
-
-        const nextTargets = exercise.repTargets.filter(
-          (_target, currentIndex) => currentIndex !== setIndex,
-        );
-
-        return {
-          ...exercise,
-          expectedSets: nextTargets.length,
-          repTargets: nextTargets,
-        };
-      }),
-    }));
-  }
-
-  function updateRepTarget(
-    exerciseId: string,
-    setIndex: number,
-    field: "minReps" | "maxReps",
-    value: string,
-  ) {
-    setDraft((current) => ({
-      ...current,
-      exercises: current.exercises.map((exercise) =>
-        exercise.id === exerciseId
-          ? {
-              ...exercise,
-              repTargets: exercise.repTargets.map((target, currentIndex) =>
-                currentIndex === setIndex
-                  ? { ...target, [field]: clampIntegerString(value, MAX_REPS) }
-                  : target,
-              ),
-            }
-          : exercise,
-      ),
-    }));
-  }
-
-  function removeExercise(exerciseId: string) {
-    setDraft((current) => ({
-      ...current,
-      exercises: current.exercises.filter((exercise) => exercise.id !== exerciseId),
-    }));
-  }
-
   return (
     <div className={styles.root}>
-      <div className={styles.header}>
-        <button
-          aria-label="Go back"
-          className="back-arrow"
-          type="button"
-          onClick={onBack}
-        >
-          ←
-        </button>
-        <div className={styles.title}>
-          <h2>{heading}</h2>
-        </div>
-      </div>
+      <TemplateEditorHeader heading={heading} onBack={onBack} />
 
       <ScrollablePane
         rail={
@@ -194,34 +71,15 @@ export function TemplateEditor({
         scrollPaddingBottom={scrollPaddingBottom}
         scrollRef={containerRef}
       >
-          <div className={`panel ${styles.panel}`}>
-            <div className={styles.grid}>
-              <label className={styles.field}>
-                <span className="field-label">Template name</span>
-                <input
-                  className="text-input"
-                  type="text"
-                  value={draft.title}
-                  onChange={(event) =>
-                    setDraft((current) => ({ ...current, title: event.target.value }))
-                  }
-                  placeholder="Push Day"
-                />
-              </label>
-              <label className={styles.field}>
-                <span className="field-label">Summary</span>
-                <input
-                  className="text-input"
-                  type="text"
-                  value={draft.summary}
-                  onChange={(event) =>
-                    setDraft((current) => ({ ...current, summary: event.target.value }))
-                  }
-                  placeholder="Chest, shoulders, triceps"
-                />
-              </label>
-            </div>
-          </div>
+          <TemplateEditorBasics
+            onSummaryChange={(value) =>
+              setDraft((current) => ({ ...current, summary: value }))
+            }
+            onTitleChange={(value) =>
+              setDraft((current) => ({ ...current, title: value }))
+            }
+            template={draft}
+          />
           <div className="stack">
             {draft.exercises.map((exercise, index) => (
               <div className={styles.scrollSnapItem} key={exercise.id} ref={setItemRef[index]}>

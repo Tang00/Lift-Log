@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal } from "@/components/ui/modal";
+import { DialogModal } from "@/components/ui/overlays/dialog-modal";
 
 type UpdateTemplateModalProps = {
   onClose: () => void;
@@ -14,12 +14,9 @@ export function UpdateTemplateModal({
   onUpdateTemplate,
 }: UpdateTemplateModalProps) {
   return (
-    <Modal title="Update template too?" titleId="update-template-title">
-      <p className="modal-copy">
-        This session no longer matches its template. Do you want to update the
-        template with the added or removed exercises and sets?
-      </p>
-      <div className="modal-actions">
+    <DialogModal
+      actions={
+        <>
         <button className="secondary-button modal-cancel-button" type="button" onClick={onClose}>
           Keep template
         </button>
@@ -29,7 +26,11 @@ export function UpdateTemplateModal({
         <button className="primary-button" type="button" onClick={onUpdateTemplate}>
           Update template
         </button>
-      </div>
-    </Modal>
+        </>
+      }
+      message="This session no longer matches its template. Do you want to update the template with the added or removed exercises and sets?"
+      title="Update template too?"
+      titleId="update-template-title"
+    />
   );
 }

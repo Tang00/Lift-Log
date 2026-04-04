@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import styles from "@/components/ui/action-group.module.css";
+import styles from "@/components/ui/actions/action-group.module.css";
 
 type ActionGroupProps = {
   children: ReactNode;

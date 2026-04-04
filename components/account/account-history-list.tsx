@@ -1,7 +1,7 @@
 "use client";
 
-import { WorkoutHistoryCard } from "@/components/workout/workout-history-card";
-import historyStyles from "@/components/workout/workout-history-card.module.css";
+import { WorkoutHistoryCard } from "@/components/workout/cards/workout-history-card";
+import historyStyles from "@/components/workout/cards/workout-history-card.module.css";
 import { Panel } from "@/components/ui/panel";
 import type { WorkoutSession } from "@/types/workout";
 

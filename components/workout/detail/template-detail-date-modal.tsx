@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 
-import calendarStyles from "@/components/ui/calendar.module.css";
-import { Modal } from "@/components/ui/modal";
+import calendarStyles from "@/components/ui/date/calendar.module.css";
+import { Modal } from "@/components/ui/overlays/modal";
 
 type CalendarDay = {
   dateValue: string | null;

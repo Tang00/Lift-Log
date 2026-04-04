@@ -7,10 +7,12 @@ import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
 import {
   deleteCompletedWorkout,
   fetchCompletedWorkouts,
-  fetchTemplates,
   saveCompletedWorkout,
+} from "@/utils/supabase/session-store";
+import {
+  fetchTemplates,
   saveTemplate,
-} from "@/utils/supabase/workout-store";
+} from "@/utils/supabase/template-store";
 import { MAX_TEMPLATES } from "@/utils/workout/limits";
 import { createTemplateFromSession, normalizeTemplate } from "@/utils/workout/session";
 
@@ -26,6 +28,10 @@ export function useWorkoutData({ onError, session }: UseWorkoutDataOptions) {
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [isSavingWorkout, setIsSavingWorkout] = useState(false);
   const userId = session?.user.id ?? null;
+
+  function formatErrorMessage(error: unknown, fallback: string) {
+    return error instanceof Error ? error.message : fallback;
+  }
 
   async function refreshData() {
     const [nextTemplates, nextWorkouts] = await Promise.all([
@@ -63,7 +69,7 @@ export function useWorkoutData({ onError, session }: UseWorkoutDataOptions) {
           return;
         }
 
-        onError(error instanceof Error ? error.message : "Failed to load workout data.");
+        onError(formatErrorMessage(error, "Failed to load workout data."));
       })
       .finally(() => {
         if (isMounted) {
@@ -95,7 +101,7 @@ export function useWorkoutData({ onError, session }: UseWorkoutDataOptions) {
       setTemplates(nextTemplates);
       return true;
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Failed to save template.");
+      onError(formatErrorMessage(error, "Failed to save template."));
       return false;
     } finally {
       setIsSavingTemplate(false);
@@ -110,7 +116,7 @@ export function useWorkoutData({ onError, session }: UseWorkoutDataOptions) {
       setWorkouts(nextWorkouts);
       return true;
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Failed to delete workout.");
+      onError(formatErrorMessage(error, "Failed to delete workout."));
       return false;
     } finally {
       setIsSavingWorkout(false);
@@ -138,7 +144,7 @@ export function useWorkoutData({ onError, session }: UseWorkoutDataOptions) {
       await refreshData();
       return true;
     } catch (error) {
-      onError(error instanceof Error ? error.message : "Failed to save workout.");
+      onError(formatErrorMessage(error, "Failed to save workout."));
       return false;
     } finally {
       setIsSavingWorkout(false);

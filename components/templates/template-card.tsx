@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "@/components/templates/template-card.module.css";
+import { CardActionButton } from "@/components/ui/actions/card-action-button";
 import type { WorkoutTemplate } from "@/types/workout";
 
 type TemplateCardProps = {
@@ -25,9 +26,9 @@ export function TemplateCard({
         </div>
         <div className="mini-pill">{template.exercises.length} exercises</div>
       </button>
-      <button className={styles.editButton} type="button" onClick={onEdit}>
+      <CardActionButton onClick={onEdit}>
         Edit
-      </button>
+      </CardActionButton>
     </div>
   );
 }

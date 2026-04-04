@@ -2,7 +2,7 @@
 
 import type { ReactNode, Ref } from "react";
 
-import styles from "@/components/ui/scrollable-pane.module.css";
+import styles from "@/components/ui/navigation/scrollable-pane.module.css";
 
 type ScrollablePaneProps = {
   children: ReactNode;

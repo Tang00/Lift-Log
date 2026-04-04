@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "@/components/templates/template-editor.module.css";
-import cardStyles from "@/components/templates/template-card.module.css";
+import { CardActionButton } from "@/components/ui/actions/card-action-button";
 import type { TemplateExercise } from "@/types/workout";
 import { clampIntegerString, MAX_REPS } from "@/utils/workout/limits";
 
@@ -41,100 +41,89 @@ export function TemplateEditorExerciseCard({
   }
 
   return (
-    <div className={`panel ${styles.panel}`}>
-      <div className="panel-header">
-        <h3>Exercise {index + 1}</h3>
-        <button className={cardStyles.removeButton} type="button" onClick={onRemove}>
-          Remove
-        </button>
-      </div>
-
-      <div className={styles.grid}>
-        <label className={styles.field}>
-          <span className="field-label">Exercise name</span>
+    <article className={styles.exerciseCard}>
+      <div className={styles.exerciseHeader}>
+        <div className={styles.exerciseHeading}>
+          <div className={styles.exerciseIndex}>Exercise {index + 1}</div>
           <input
-            className="text-input"
+            className={`text-input ${styles.exerciseNameInput}`}
             type="text"
             value={exercise.name}
             onChange={(event) => onNameChange(event.target.value)}
             placeholder="Bench Press"
           />
-        </label>
-
-        <label className={`${styles.field} ${styles.fieldFull}`}>
-          <span className="field-label">Template note</span>
           <textarea
-            className="text-input text-area-input"
+            className={`text-input text-area-input ${styles.exerciseNoteInput}`}
             value={exercise.note}
             onChange={(event) => onNoteChange(event.target.value)}
             placeholder="Shown under the exercise name during the workout"
             rows={2}
           />
-        </label>
-
-        <div className={`${styles.field} ${styles.fieldFull}`}>
-          <div className="panel-header">
-            <span className="field-label">Rep targets by set</span>
-          </div>
-          <div className={styles.repTargetList}>
-            {exercise.repTargets.map((target, setIndex) => (
-              <div className={styles.repTargetRow} key={`${exercise.id}-${setIndex + 1}`}>
-                <span className={styles.repTargetLabel}>Set {setIndex + 1}</span>
-                <label className={styles.repTargetField}>
-                  <span className={styles.repTargetCaption}>Min</span>
-                  <input
-                  className="text-input"
-                  type="text"
-                  value={target.minReps}
-                  inputMode="numeric"
-                  maxLength={2}
-                  onChange={(event) => {
-                      const nextValue = sanitizeIntegerInput(event.target.value);
-                      if (nextValue !== null) {
-                        onRepTargetChange(setIndex, "minReps", nextValue);
-                      }
-                    }}
-                  />
-                </label>
-                <label className={styles.repTargetField}>
-                  <span className={styles.repTargetCaption}>Max</span>
-                  <input
-                  className="text-input"
-                  type="text"
-                  value={target.maxReps}
-                  inputMode="numeric"
-                  maxLength={2}
-                  onChange={(event) => {
-                      const nextValue = sanitizeIntegerInput(event.target.value);
-                      if (nextValue !== null) {
-                        onRepTargetChange(setIndex, "maxReps", nextValue);
-                      }
-                    }}
-                  />
-                </label>
-                <button
-                  className={cardStyles.removeButton}
-                  disabled={exercise.repTargets.length <= 1}
-                  type="button"
-                  onClick={() => onRemoveSet(setIndex)}
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
-          <div className={styles.repTargetActions}>
-            <button
-              className={cardStyles.editButton}
-              disabled={!canAddSet}
-              type="button"
-              onClick={onAddSet}
-            >
-              Add set
-            </button>
-          </div>
         </div>
+        <CardActionButton
+          aria-label={`Remove ${exercise.name || "exercise"}`}
+          className={styles.removeExerciseButton}
+          square
+          tone="danger"
+          onClick={onRemove}
+        >
+          ×
+        </CardActionButton>
       </div>
-    </div>
+
+      <div className={styles.repTable}>
+        <div className={styles.repTableHeader}>
+          <span>Set</span>
+          <span>Min</span>
+          <span>Max</span>
+        </div>
+        {exercise.repTargets.map((target, setIndex) => (
+          <div className={styles.repTableRow} key={`${exercise.id}-${setIndex + 1}`}>
+            <div className={styles.repSetIndex}>{setIndex + 1}</div>
+            <input
+              aria-label={`${exercise.name || "Exercise"} set ${setIndex + 1} minimum reps`}
+              className={`text-input ${styles.repInput}`}
+              type="text"
+              value={target.minReps}
+              inputMode="numeric"
+              maxLength={2}
+              onChange={(event) => {
+                const nextValue = sanitizeIntegerInput(event.target.value);
+                if (nextValue !== null) {
+                  onRepTargetChange(setIndex, "minReps", nextValue);
+                }
+              }}
+            />
+            <input
+              aria-label={`${exercise.name || "Exercise"} set ${setIndex + 1} maximum reps`}
+              className={`text-input ${styles.repInput}`}
+              type="text"
+              value={target.maxReps}
+              inputMode="numeric"
+              maxLength={2}
+              onChange={(event) => {
+                const nextValue = sanitizeIntegerInput(event.target.value);
+                if (nextValue !== null) {
+                  onRepTargetChange(setIndex, "maxReps", nextValue);
+                }
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.footerControls}>
+        <CardActionButton disabled={!canAddSet} onClick={onAddSet}>
+          Add set
+        </CardActionButton>
+        <CardActionButton
+          disabled={exercise.repTargets.length <= 1}
+          tone="danger"
+          onClick={() => onRemoveSet(exercise.repTargets.length - 1)}
+        >
+          Remove set
+        </CardActionButton>
+      </div>
+    </article>
   );
 }

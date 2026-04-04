@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 
-import calendarStyles from "@/components/ui/calendar.module.css";
-import historyStyles from "@/components/workout/workout-history-card.module.css";
+import calendarStyles from "@/components/ui/date/calendar.module.css";
+import historyStyles from "@/components/workout/cards/workout-history-card.module.css";
 import { Panel } from "@/components/ui/panel";
 import type { WorkoutSession } from "@/types/workout";
 

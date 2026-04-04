@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal } from "@/components/ui/modal";
+import { DialogModal } from "@/components/ui/overlays/dialog-modal";
 
 type ConfirmationModalProps = {
   cancelLabel?: string;
@@ -24,9 +24,9 @@ export function ConfirmationModal({
   titleId,
 }: ConfirmationModalProps) {
   return (
-    <Modal title={title} titleId={titleId}>
-      <p className="modal-copy">{message}</p>
-      <div className="modal-actions">
+    <DialogModal
+      actions={
+        <>
         <button className="secondary-button modal-cancel-button" type="button" onClick={onCancel}>
           {cancelLabel}
         </button>
@@ -41,7 +41,11 @@ export function ConfirmationModal({
         >
           {confirmLabel}
         </button>
-      </div>
-    </Modal>
+        </>
+      }
+      message={message}
+      title={title}
+      titleId={titleId}
+    />
   );
 }

@@ -2,17 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { useSegmentedScroll } from "@/hooks/use-segmented-scroll";
-import { ActionGroup } from "@/components/ui/action-group";
-import { SegmentedScrollNav } from "@/components/ui/segmented-scroll-nav";
-import { ScrollablePane } from "@/components/ui/scrollable-pane";
-import styles from "@/components/workout/template-detail.module.css";
-import cardStyles from "@/components/templates/template-card.module.css";
-import { DeleteWorkoutModal } from "@/components/workout/delete-workout-modal";
-import { ExerciseCard } from "@/components/workout/exercise-card";
-import { TemplateDetailDateModal } from "@/components/workout/template-detail-date-modal";
+import { useSegmentedScroll } from "@/hooks/ui/use-segmented-scroll";
+import { SegmentedScrollNav } from "@/components/ui/navigation/segmented-scroll-nav";
+import { ScrollablePane } from "@/components/ui/navigation/scrollable-pane";
+import styles from "@/components/workout/detail/template-detail.module.css";
+import { DeleteWorkoutModal } from "@/components/workout/modals/delete-workout-modal";
+import { ExerciseCard } from "@/components/workout/cards/exercise-card";
+import { TemplateDetailDateModal } from "@/components/workout/detail/template-detail-date-modal";
+import { TemplateDetailFooter } from "@/components/workout/detail/template-detail-footer";
+import { TemplateDetailHeader } from "@/components/workout/detail/template-detail-header";
 import type { WorkoutSession, WorkoutSetEntry } from "@/types/workout";
-import { MAX_EXERCISES } from "@/utils/workout/limits";
 
 type TemplateDetailProps = {
   onAddExercise: () => void;
@@ -119,34 +118,16 @@ export function TemplateDetail({
 
   return (
     <div className={styles.root}>
-      <div className={styles.header}>
-        <button
-          aria-label="Go back"
-          className="back-arrow"
-          type="button"
-          onClick={onBack}
-        >
-          ←
-        </button>
-        <div className={styles.title}>
-          <h2>{session.title}</h2>
-          <button
-            className={`exercise-subtext ${styles.sessionDateButton}`}
-            disabled={isReadOnly}
-            type="button"
-            onClick={() => setIsDateDialogOpen(true)}
-          >
-            {dateLabel}
-          </button>
-        </div>
-        <div className={styles.headerActions}>
-          {isSavedSession && !isEditingSavedSession ? (
-            <button className={cardStyles.editButton} type="button" onClick={onStartEditing}>
-              Edit
-            </button>
-          ) : null}
-        </div>
-      </div>
+      <TemplateDetailHeader
+        dateLabel={dateLabel}
+        isEditingSavedSession={isEditingSavedSession}
+        isReadOnly={isReadOnly}
+        isSavedSession={isSavedSession}
+        onBack={onBack}
+        onOpenDate={() => setIsDateDialogOpen(true)}
+        onStartEditing={onStartEditing}
+        title={session.title}
+      />
 
       <ScrollablePane
         rail={
@@ -187,26 +168,15 @@ export function TemplateDetail({
         </div>
         {!isSavedSession || isEditingSavedSession ? (
           <div className={styles.scrollFooter} ref={trailingRef}>
-            <ActionGroup>
-              <button
-                className="secondary-button"
-                disabled={session.exercises.length >= MAX_EXERCISES}
-                type="button"
-                onClick={onAddExercise}
-              >
-                Add exercise
-              </button>
-              <button
-                className="secondary-button danger-button"
-                type="button"
-                onClick={() => setIsDeleteDialogOpen(true)}
-              >
-                {isSavedSession ? "Delete workout" : "Discard workout"}
-              </button>
-              <button className="primary-button" type="button" onClick={onCompleteWorkout}>
-                {isSavedSession ? "Save changes" : `Complete workout (${completedSets}/${totalSets})`}
-              </button>
-            </ActionGroup>
+            <TemplateDetailFooter
+              completedSets={completedSets}
+              exerciseCount={session.exercises.length}
+              isSavedSession={isSavedSession}
+              onAddExercise={onAddExercise}
+              onDeleteWorkout={() => setIsDeleteDialogOpen(true)}
+              onSaveWorkout={onCompleteWorkout}
+              totalSets={totalSets}
+            />
           </div>
         ) : null}
       </ScrollablePane>

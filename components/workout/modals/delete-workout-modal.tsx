@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfirmationModal } from "@/components/ui/confirmation-modal";
+import { ConfirmationModal } from "@/components/ui/overlays/confirmation-modal";
 
 type DeleteWorkoutModalProps = {
   isSavedSession: boolean;

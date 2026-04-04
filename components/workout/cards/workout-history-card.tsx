@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "@/components/workout/workout-history-card.module.css";
+import styles from "@/components/workout/cards/workout-history-card.module.css";
 import type { WorkoutSession } from "@/types/workout";
 
 type WorkoutHistoryCardProps = {

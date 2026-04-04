@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 
-import cardStyles from "@/components/templates/template-card.module.css";
-import { ConfirmationModal } from "@/components/ui/confirmation-modal";
-import styles from "@/components/workout/exercise-card.module.css";
+import { CardActionButton } from "@/components/ui/actions/card-action-button";
+import { ConfirmationModal } from "@/components/ui/overlays/confirmation-modal";
+import styles from "@/components/workout/cards/exercise-card.module.css";
 import type { WorkoutExerciseEntry, WorkoutSetEntry } from "@/types/workout";
 import { clampDecimalString, clampIntegerString, MAX_REPS, MAX_SETS, MAX_WEIGHT } from "@/utils/workout/limits";
 
@@ -107,15 +107,15 @@ export function ExerciseCard({
           />
         </div>
         {!readOnly ? (
-          <button
+          <CardActionButton
             aria-label={`Remove ${exercise.name || "exercise"}`}
-            className={`${cardStyles.iconButton} ${styles.removeExerciseButton}`}
+            className={styles.removeExerciseButton}
             disabled={!canRemoveExercise}
-            type="button"
+            square
             onClick={() => setIsRemoveDialogOpen(true)}
           >
             ×
-          </button>
+          </CardActionButton>
         ) : null}
       </div>
 
@@ -216,22 +216,19 @@ export function ExerciseCard({
 
       {!readOnly ? (
         <div className={styles.footerControls}>
-          <button
-            className={cardStyles.editButton}
+          <CardActionButton
             disabled={exercise.sets.length >= MAX_SETS}
-            type="button"
             onClick={onAddSet}
           >
             Add set
-          </button>
-          <button
-            className={cardStyles.removeButton}
+          </CardActionButton>
+          <CardActionButton
             disabled={exercise.sets.length <= 1}
-            type="button"
+            tone="danger"
             onClick={onRemoveSet}
           >
             Remove set
-          </button>
+          </CardActionButton>
         </div>
       ) : null}
 

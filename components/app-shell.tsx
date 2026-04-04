@@ -1,36 +1,22 @@
 "use client";
 
-import { useState } from "react";
-
 import styles from "@/components/app-shell.module.css";
 import { AccountView } from "@/components/account/account-view";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { SiteHeader } from "@/components/layout/site-header";
 import { TemplateEditor } from "@/components/templates/template-editor";
 import { TemplateMenu } from "@/components/templates/template-menu";
-import { LoadingModal } from "@/components/ui/loading-modal";
-import { TemplateDetail } from "@/components/workout/template-detail";
-import { UpdateTemplateModal } from "@/components/workout/update-template-modal";
-import { useActiveWorkout } from "@/hooks/use-active-workout";
-import { useAuthSession } from "@/hooks/use-auth-session";
-import { useThemeMode } from "@/hooks/use-theme-mode";
-import { useWorkoutData } from "@/hooks/use-workout-data";
+import { LoadingModal } from "@/components/ui/overlays/loading-modal";
+import { TemplateDetail } from "@/components/workout/detail/template-detail";
+import { UpdateTemplateModal } from "@/components/workout/modals/update-template-modal";
+import { useAppFlow } from "@/hooks/app/use-app-flow";
+import { useActiveWorkout } from "@/hooks/workout/use-active-workout";
+import { useAuthSession } from "@/hooks/auth/use-auth-session";
+import { useThemeMode } from "@/hooks/ui/use-theme-mode";
+import { useWorkoutData } from "@/hooks/data/use-workout-data";
 import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
 import { MAX_TEMPLATES } from "@/utils/workout/limits";
 import { createEmptyTemplate, normalizeTemplate, sessionDiffersFromTemplate } from "@/utils/workout/session";
-
-type Screen =
-  | { name: "menu" }
-  | { name: "account" }
-  | { name: "detail"; returnTo: "menu" | "account" }
-  | { name: "editor"; mode: "create" | "edit"; templateId: string };
-
-function screenFromReturnTarget(target: "menu" | "account"): Extract<
-  Screen,
-  { name: "menu" } | { name: "account" }
-> {
-  return target === "account" ? { name: "account" } : { name: "menu" };
-}
 
 export function AppShell() {
   const {
@@ -44,15 +30,24 @@ export function AppShell() {
     signInWithMagicLink,
     signOut,
   } = useAuthSession();
-  const [screen, setScreen] = useState<Screen>({ name: "menu" });
-  const [draftTemplate, setDraftTemplate] = useState<WorkoutTemplate | null>(null);
-  const [pendingTemplateUpdate, setPendingTemplateUpdate] = useState<{
-    template: WorkoutTemplate;
-    workout: WorkoutSession;
-  } | null>(null);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
-  const [isInviting, setIsInviting] = useState(false);
+  const {
+    closeEditor,
+    draftTemplate,
+    inviteEmail,
+    inviteMessage,
+    isInviting,
+    openAccount,
+    openDetail,
+    openEditor,
+    openMenu,
+    pendingTemplateUpdate,
+    screen,
+    setInviteEmail,
+    setInviteMessage,
+    setIsInviting,
+    setPendingTemplateUpdate,
+    reset,
+  } = useAppFlow();
   const { themeMode, setThemeMode } = useThemeMode();
   const {
     deleteWorkoutRecord,
@@ -101,11 +96,7 @@ export function AppShell() {
       return;
     }
 
-    setScreen({ name: "menu" });
-    setDraftTemplate(null);
-    setPendingTemplateUpdate(null);
-    setInviteEmail("");
-    setInviteMessage(null);
+    reset();
     clearAllWorkoutState();
   }
 
@@ -153,13 +144,8 @@ export function AppShell() {
       ? structuredClone(normalizeTemplate(template))
       : createEmptyTemplate();
 
-    setDraftTemplate(nextTemplate);
     setIsEditingSavedSession(false);
-    setScreen({
-      name: "editor",
-      mode,
-      templateId: nextTemplate.id,
-    });
+    openEditor(mode, nextTemplate);
   }
 
   async function handleSaveTemplate(template: WorkoutTemplate) {
@@ -169,8 +155,7 @@ export function AppShell() {
       return;
     }
 
-    setDraftTemplate(null);
-    setScreen({ name: "menu" });
+    closeEditor();
   }
 
   async function handleDeleteWorkout() {
@@ -185,12 +170,12 @@ export function AppShell() {
       }
 
       clearHistoryWorkout();
-      setScreen({ name: "account" });
+      openAccount();
       return;
     }
 
     clearInProgressWorkout();
-    setScreen({ name: "menu" });
+    openMenu();
   }
 
   async function persistWorkout(
@@ -210,7 +195,7 @@ export function AppShell() {
     }
 
     setPendingTemplateUpdate(null);
-    setScreen({ name: "account" });
+    openAccount();
   }
 
   async function handleCompleteWorkout() {
@@ -274,14 +259,12 @@ export function AppShell() {
             <SiteHeader
               accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
               onSelectAccount={() => {
-                setDraftTemplate(null);
                 clearHistoryWorkout();
-                setScreen({ name: "account" });
+                openAccount();
               }}
               onSelectTemplates={() => {
-                setDraftTemplate(null);
                 setIsEditingSavedSession(false);
-                setScreen({ name: "menu" });
+                openMenu();
               }}
             />
             <div className="panel">
@@ -300,14 +283,12 @@ export function AppShell() {
           <SiteHeader
             accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
             onSelectAccount={() => {
-              setDraftTemplate(null);
               clearHistoryWorkout();
-              setScreen({ name: "account" });
+              openAccount();
             }}
             onSelectTemplates={() => {
-              setDraftTemplate(null);
               setIsEditingSavedSession(false);
-              setScreen({ name: "menu" });
+              openMenu();
             }}
           />
 
@@ -316,7 +297,7 @@ export function AppShell() {
               inProgressWorkout={inProgressWorkout}
               onCreateBlankWorkout={() => {
                 openBlankWorkout();
-                setScreen({ name: "detail", returnTo: "menu" });
+                openDetail("menu");
               }}
               templates={templates}
               onCreateTemplate={() => openTemplateEditor("create")}
@@ -327,11 +308,11 @@ export function AppShell() {
                 }
 
                 clearHistoryWorkout();
-                setScreen({ name: "detail", returnTo: "menu" });
+                openDetail("menu");
               }}
               onSelectTemplate={(template) => {
                 openTemplate(template);
-                setScreen({ name: "detail", returnTo: "menu" });
+                openDetail("menu");
               }}
             />
           ) : null}
@@ -348,7 +329,7 @@ export function AppShell() {
               onInviteSubmit={() => void handleInviteFriend()}
               onOpenWorkout={(workout) => {
                 openWorkout(workout);
-                setScreen({ name: "detail", returnTo: "account" });
+                openDetail("account");
               }}
               onSignOut={() => void handleLogout()}
               onThemeChange={setThemeMode}
@@ -365,7 +346,11 @@ export function AppShell() {
                 if (screen.returnTo === "account") {
                   clearHistoryWorkout();
                 }
-                setScreen(screenFromReturnTarget(screen.returnTo));
+                if (screen.returnTo === "account") {
+                  openAccount();
+                  return;
+                }
+                openMenu();
               }}
               onCompleteWorkout={() => void handleCompleteWorkout()}
               onDeleteWorkout={() => void handleDeleteWorkout()}
@@ -389,9 +374,8 @@ export function AppShell() {
               mode={screen.mode}
               onDirtyChange={undefined}
               onBack={() => {
-                setDraftTemplate(null);
                 setIsEditingSavedSession(false);
-                setScreen({ name: "menu" });
+                closeEditor();
               }}
               onSave={(template) => void handleSaveTemplate(template)}
               template={currentDraft}
