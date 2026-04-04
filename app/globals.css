@@ -240,13 +240,12 @@ a {
   }
 
   .mobile-frame {
-    min-height: 100svh;
     height: auto;
     overflow: visible;
   }
 
   .screen {
-    min-height: 100svh;
+    min-height: 0;
     overflow: visible;
   }
 }
