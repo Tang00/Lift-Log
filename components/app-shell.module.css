@@ -5,3 +5,8 @@
 .screen {
   gap: 16px;
 }
+
+.flushScreen {
+  gap: 8px;
+  padding: 0;
+}

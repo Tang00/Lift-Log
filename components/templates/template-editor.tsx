@@ -45,9 +45,7 @@ export function TemplateEditor({
   const {
     activeIndex,
     containerRef,
-    isScrollActive,
     scrollPaddingBottom,
-    scrubToIndex,
     scrollToIndex,
     setItemRef,
     trailingRef,
@@ -62,9 +60,7 @@ export function TemplateEditor({
           <SegmentedScrollNav
             activeIndex={activeIndex}
             count={draft.exercises.length}
-            isVisible={isScrollActive}
             labels={draft.exercises.map((exercise) => exercise.name || "Exercise")}
-            onScrub={scrubToIndex}
             onSelect={scrollToIndex}
           />
         }

@@ -89,6 +89,8 @@ export function AppShell() {
   const canManageInvites = process.env.NEXT_PUBLIC_ENABLE_INVITES === "true";
   const currentDraft =
     screen.name === "editor" && draftTemplate ? draftTemplate : null;
+  const isFlushScreen = screen.name === "detail" || screen.name === "editor";
+  const showSiteHeader = screen.name === "menu" || screen.name === "account";
 
   async function handleLogout() {
     const didSignOut = await signOut();
@@ -279,18 +281,22 @@ export function AppShell() {
   return (
     <main className="page-shell">
       <section className={`mobile-frame ${styles.frame}`}>
-        <div className={`screen ${styles.screen}`}>
-          <SiteHeader
-            accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
-            onSelectAccount={() => {
-              clearHistoryWorkout();
-              openAccount();
-            }}
-            onSelectTemplates={() => {
-              setIsEditingSavedSession(false);
-              openMenu();
-            }}
-          />
+        <div
+          className={`screen ${styles.screen} ${isFlushScreen ? styles.flushScreen : ""}`}
+        >
+          {showSiteHeader ? (
+            <SiteHeader
+              accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
+              onSelectAccount={() => {
+                clearHistoryWorkout();
+                openAccount();
+              }}
+              onSelectTemplates={() => {
+                setIsEditingSavedSession(false);
+                openMenu();
+              }}
+            />
+          ) : null}
 
           {screen.name === "menu" ? (
             <TemplateMenu

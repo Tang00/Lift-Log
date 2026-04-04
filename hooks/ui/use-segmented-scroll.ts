@@ -13,7 +13,6 @@ export function useSegmentedScroll(itemCount: number) {
   const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
   const trailingRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isScrollActive, setIsScrollActive] = useState(false);
   const [scrollPaddingBottom, setScrollPaddingBottom] = useState(0);
 
   useEffect(() => {
@@ -81,7 +80,6 @@ export function useSegmentedScroll(itemCount: number) {
     }
 
     let frameId = 0;
-    let scrollTimeoutId = 0;
 
     function updateActiveFromScroll() {
       frameId = 0;
@@ -92,17 +90,16 @@ export function useSegmentedScroll(itemCount: number) {
       }
 
       const rootScrollTop = nextRoot.scrollTop;
+      const activationOffset = 12;
       let nextIndex = 0;
-      let closestDistance = Number.POSITIVE_INFINITY;
 
       itemRefs.current.forEach((item, index) => {
         if (!item) {
           return;
         }
 
-        const distance = Math.abs(getItemTop(nextRoot, item) - rootScrollTop);
-        if (distance < closestDistance) {
-          closestDistance = distance;
+        const itemTop = getItemTop(nextRoot, item);
+        if (itemTop <= rootScrollTop + activationOffset) {
           nextIndex = index;
         }
       });
@@ -111,15 +108,6 @@ export function useSegmentedScroll(itemCount: number) {
     }
 
     function handleScroll() {
-      setIsScrollActive(true);
-      if (scrollTimeoutId !== 0) {
-        window.clearTimeout(scrollTimeoutId);
-      }
-      scrollTimeoutId = window.setTimeout(() => {
-        setIsScrollActive(false);
-        scrollTimeoutId = 0;
-      }, 700);
-
       if (frameId !== 0) {
         return;
       }
@@ -134,9 +122,6 @@ export function useSegmentedScroll(itemCount: number) {
       root.removeEventListener("scroll", handleScroll);
       if (frameId !== 0) {
         window.cancelAnimationFrame(frameId);
-      }
-      if (scrollTimeoutId !== 0) {
-        window.clearTimeout(scrollTimeoutId);
       }
     };
   }, [itemCount]);
@@ -160,19 +145,6 @@ export function useSegmentedScroll(itemCount: number) {
     return Math.max(getItemTop(root, item), 0);
   }
 
-  function scrubToIndex(index: number) {
-    const root = containerRef.current;
-    const nextTop = getScrollTopForIndex(index);
-
-    if (!root || nextTop == null) {
-      return;
-    }
-
-    root.scrollTop = nextTop;
-    setActiveIndex(index);
-    setIsScrollActive(true);
-  }
-
   function scrollToIndex(index: number, behavior: ScrollBehavior = "smooth") {
     const root = containerRef.current;
     const nextTop = getScrollTopForIndex(index);
@@ -190,9 +162,7 @@ export function useSegmentedScroll(itemCount: number) {
   return {
     activeIndex,
     containerRef,
-    isScrollActive,
     scrollPaddingBottom,
-    scrubToIndex,
     scrollToIndex,
     setItemRef,
     trailingRef,

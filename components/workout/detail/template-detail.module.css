@@ -1,17 +1,18 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   flex: 1 1 auto;
   min-height: 0;
 }
 
 .header {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 6px;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
   width: 100%;
+  padding: 4px 8px 2px 0;
 }
 
 .headerActions {
@@ -23,7 +24,7 @@
 .title {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
   align-items: flex-start;
 }
@@ -31,6 +32,8 @@
 .title h2 {
   margin: 0;
   min-width: 0;
+  font-size: 1.02rem;
+  line-height: 1.2;
 }
 
 .sessionDateButton {
@@ -38,7 +41,7 @@
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 600;
   min-width: 0;
   white-space: nowrap;
@@ -57,16 +60,17 @@
 }
 
 .scrollFooter {
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 @media (max-width: 520px) {
   .sessionDateButton {
-    font-size: 0.74rem;
+    font-size: 0.68rem;
   }
 
   .header {
-    grid-template-columns: 36px minmax(0, 1fr) auto;
-    gap: 6px;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: 7px;
+    padding: 2px 6px 2px 0;
   }
 }

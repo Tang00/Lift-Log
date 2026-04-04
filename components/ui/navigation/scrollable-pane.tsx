@@ -33,6 +33,7 @@ export function ScrollablePane({
         className,
       )}
     >
+      {rail}
       <div
         className={joinClassNames(styles.scrollArea, scrollClassName)}
         ref={scrollRef}
@@ -44,7 +45,6 @@ export function ScrollablePane({
       >
         {children}
       </div>
-      {rail}
     </div>
   );
 }
