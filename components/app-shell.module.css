@@ -1,0 +1,7 @@
+.frame {
+  width: min(100%, 560px);
+}
+
+.screen {
+  gap: 16px;
+}

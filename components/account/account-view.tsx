@@ -4,7 +4,9 @@ import styles from "@/components/account/account-view.module.css";
 import { AccountCalendar } from "@/components/account/account-calendar";
 import { AccountHistoryList } from "@/components/account/account-history-list";
 import { AccountThemeToggle } from "@/components/account/account-theme-toggle";
+import type { ThemeMode } from "@/hooks/use-theme-mode";
 import { Panel } from "@/components/ui/panel";
+import { ScrollablePane } from "@/components/ui/scrollable-pane";
 import type { WorkoutSession } from "@/types/workout";
 
 type AccountViewProps = {
@@ -18,8 +20,8 @@ type AccountViewProps = {
   onInviteSubmit: () => void;
   onOpenWorkout: (workout: WorkoutSession) => void;
   onSignOut: () => void;
-  onThemeChange: (value: "system" | "light" | "dark") => void;
-  themeMode: "system" | "light" | "dark";
+  onThemeChange: (value: ThemeMode) => void;
+  themeMode: ThemeMode;
   workouts: WorkoutSession[];
 };
 
@@ -39,7 +41,7 @@ export function AccountView({
   workouts,
 }: AccountViewProps) {
   return (
-    <div className={styles.root}>
+    <ScrollablePane>
       <div className={styles.stack}>
         <Panel>
           <div className={styles.summary}>
@@ -83,6 +85,6 @@ export function AccountView({
           Sign out
         </button>
       </div>
-    </div>
+    </ScrollablePane>
   );
 }

@@ -20,7 +20,7 @@
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.58);
+  background: var(--surface);
   color: var(--text);
   font-size: 0.8rem;
   font-weight: 800;
@@ -52,7 +52,7 @@
   display: grid;
   place-items: center;
   padding: 0;
-  background: rgba(87, 69, 47, 0.08);
+  background: var(--surface);
   color: var(--text);
   font-weight: 700;
 }
@@ -62,25 +62,25 @@
 }
 
 .monthLevel2 {
-  background: rgba(214, 99, 58, 0.38);
+  background: var(--accent-soft);
 }
 
 .monthLevel3 {
-  background: rgba(214, 99, 58, 0.6);
+  background: var(--accent-strong);
 }
 
 .monthLevel4 {
-  background: rgba(214, 99, 58, 0.82);
-  color: white;
+  background: var(--brand);
+  color: var(--brand-contrast);
 }
 
 .monthDayToday {
-  border-color: rgba(71, 54, 35, 0.48);
+  border-color: var(--border-strong);
 }
 
 .monthDaySelected {
-  background: rgba(214, 99, 58, 0.2);
-  border-color: rgba(214, 99, 58, 0.5);
+  background: var(--accent-strong);
+  border-color: var(--brand);
 }
 
 .monthDay:disabled {

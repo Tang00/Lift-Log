@@ -13,7 +13,7 @@
 }
 
 .item + .item {
-  border-top: 1px solid rgba(71, 54, 35, 0.05);
+  border-top: 1px solid var(--border);
 }
 
 .itemMain {

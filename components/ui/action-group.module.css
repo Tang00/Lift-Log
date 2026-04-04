@@ -1,0 +1,20 @@
+.group {
+  display: flex;
+  gap: 12px;
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.horizontal {
+  flex-direction: row;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.fullWidth > * {
+  width: 100%;
+}

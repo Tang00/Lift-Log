@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export type ThemeMode = "system" | "light" | "dark";
+export type ThemeMode = "system" | "light" | "dark" | "sage";
 
 const STORAGE_KEY = "lift-log-theme";
 
@@ -18,7 +18,8 @@ export function useThemeMode() {
     if (
       storedTheme === "system" ||
       storedTheme === "light" ||
-      storedTheme === "dark"
+      storedTheme === "dark" ||
+      storedTheme === "sage"
     ) {
       setThemeMode(storedTheme);
     }
@@ -30,17 +31,14 @@ export function useThemeMode() {
     }
 
     const root = document.documentElement;
-    const body = document.body;
 
     if (themeMode === "system") {
       root.removeAttribute("data-theme");
-      body.removeAttribute("data-theme");
       window.localStorage.removeItem(STORAGE_KEY);
       return;
     }
 
     root.setAttribute("data-theme", themeMode);
-    body.setAttribute("data-theme", themeMode);
     window.localStorage.setItem(STORAGE_KEY, themeMode);
   }, [themeMode]);
 

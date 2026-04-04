@@ -5,6 +5,7 @@ import { TemplateCard } from "@/components/templates/template-card";
 import cardStyles from "@/components/templates/template-card.module.css";
 import styles from "@/components/templates/template-menu.module.css";
 import { Panel } from "@/components/ui/panel";
+import { ScrollablePane } from "@/components/ui/scrollable-pane";
 import type { WorkoutSession, WorkoutTemplate } from "@/types/workout";
 import { MAX_TEMPLATES } from "@/utils/workout/limits";
 
@@ -30,7 +31,7 @@ export function TemplateMenu({
   const hasReachedTemplateLimit = templates.length >= MAX_TEMPLATES;
 
   return (
-    <div className={styles.root}>
+    <ScrollablePane>
       <div className={styles.stack}>
         <Panel title="Start a workout">
           <button className="primary-button" type="button" onClick={onCreateBlankWorkout}>
@@ -64,7 +65,7 @@ export function TemplateMenu({
           {templates.length === 0 ? (
             <div className="empty-state">No templates yet.</div>
           ) : (
-            <div className="template-list">
+            <div className={styles.templateList}>
               {templates.map((template) => (
                 <TemplateCard
                   key={template.id}
@@ -77,6 +78,6 @@ export function TemplateMenu({
           )}
         </Panel>
       </div>
-    </div>
+    </ScrollablePane>
   );
 }

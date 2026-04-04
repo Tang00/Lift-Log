@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useSegmentedScroll } from "@/hooks/use-segmented-scroll";
+import { ActionGroup } from "@/components/ui/action-group";
 import { SegmentedScrollNav } from "@/components/ui/segmented-scroll-nav";
+import { ScrollablePane } from "@/components/ui/scrollable-pane";
 import styles from "@/components/workout/template-detail.module.css";
 import cardStyles from "@/components/templates/template-card.module.css";
 import { DeleteWorkoutModal } from "@/components/workout/delete-workout-modal";
@@ -146,33 +148,46 @@ export function TemplateDetail({
         </div>
       </div>
 
-      <div className={styles.scrollLayout}>
-        <div
-          className={styles.scrollArea}
-          ref={containerRef}
-          style={{ paddingBottom: `${scrollPaddingBottom}px` }}
-        >
-          <div className="exercise-list">
-            {session.exercises.map((exercise, exerciseIndex) => (
-              <div className={styles.scrollSnapItem} key={`${session.id}-${exercise.exerciseId}`} ref={setItemRef[exerciseIndex]}>
-                <ExerciseCard
-                  canRemoveExercise={session.exercises.length > 1}
-                  exercise={exercise}
-                  readOnly={isReadOnly}
-                  onAddSet={() => onAddSet(exerciseIndex)}
-                  onRemoveExercise={() => onRemoveExercise(exerciseIndex)}
-                  onRemoveSet={() => onRemoveSet(exerciseIndex)}
-                  onUpdateName={(value) => onUpdateExerciseName(exerciseIndex, value)}
-                  onUpdateNote={(value) => onUpdateNote(exerciseIndex, value)}
-                  onUpdateSet={(setIndex, field, value) =>
-                    onUpdateSet(exerciseIndex, setIndex, field, value)
-                  }
-                />
-              </div>
-            ))}
-          </div>
-          {!isSavedSession || isEditingSavedSession ? (
-            <div className={`${styles.actionStack} ${styles.scrollFooter}`} ref={trailingRef}>
+      <ScrollablePane
+        rail={
+          <SegmentedScrollNav
+            activeIndex={activeIndex}
+            count={session.exercises.length}
+            isVisible={isScrollActive}
+            labels={session.exercises.map((exercise) => exercise.name || "Exercise")}
+            onScrub={scrubToIndex}
+            onSelect={scrollToIndex}
+          />
+        }
+        scrollPaddingBottom={scrollPaddingBottom}
+        scrollRef={containerRef}
+      >
+        <div className={styles.exerciseList}>
+          {session.exercises.map((exercise, exerciseIndex) => (
+            <div
+              className={styles.scrollSnapItem}
+              key={`${session.id}-${exercise.exerciseId}`}
+              ref={setItemRef[exerciseIndex]}
+            >
+              <ExerciseCard
+                canRemoveExercise={session.exercises.length > 1}
+                exercise={exercise}
+                readOnly={isReadOnly}
+                onAddSet={() => onAddSet(exerciseIndex)}
+                onRemoveExercise={() => onRemoveExercise(exerciseIndex)}
+                onRemoveSet={() => onRemoveSet(exerciseIndex)}
+                onUpdateName={(value) => onUpdateExerciseName(exerciseIndex, value)}
+                onUpdateNote={(value) => onUpdateNote(exerciseIndex, value)}
+                onUpdateSet={(setIndex, field, value) =>
+                  onUpdateSet(exerciseIndex, setIndex, field, value)
+                }
+              />
+            </div>
+          ))}
+        </div>
+        {!isSavedSession || isEditingSavedSession ? (
+          <div className={styles.scrollFooter} ref={trailingRef}>
+            <ActionGroup>
               <button
                 className="secondary-button"
                 disabled={session.exercises.length >= MAX_EXERCISES}
@@ -188,26 +203,13 @@ export function TemplateDetail({
               >
                 {isSavedSession ? "Delete workout" : "Discard workout"}
               </button>
-              <button
-                className="primary-button"
-                style={{ display: "block", width: "100%" }}
-                type="button"
-                onClick={onCompleteWorkout}
-              >
+              <button className="primary-button" type="button" onClick={onCompleteWorkout}>
                 {isSavedSession ? "Save changes" : `Complete workout (${completedSets}/${totalSets})`}
               </button>
-            </div>
-          ) : null}
-        </div>
-        <SegmentedScrollNav
-          activeIndex={activeIndex}
-          count={session.exercises.length}
-          isVisible={isScrollActive}
-          labels={session.exercises.map((exercise) => exercise.name || "Exercise")}
-          onScrub={scrubToIndex}
-          onSelect={scrollToIndex}
-        />
-      </div>
+            </ActionGroup>
+          </div>
+        ) : null}
+      </ScrollablePane>
 
       {isDateDialogOpen ? (
         <TemplateDetailDateModal

@@ -1,5 +1,5 @@
 .card {
-  border: 1px solid rgba(71, 54, 35, 0.08);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--surface-strong);
   padding: 14px;
@@ -43,7 +43,7 @@
   display: flex;
   flex-direction: column;
   margin-top: 10px;
-  border: 1px solid rgba(87, 69, 47, 0.1);
+  border: 1px solid var(--border-strong);
   border-radius: 10px;
   overflow: hidden;
   background: var(--surface-strong);
@@ -59,8 +59,8 @@
 }
 
 .tableHeader {
-  border-bottom: 1px solid rgba(87, 69, 47, 0.08);
-  background: var(--bg-accent);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
   color: var(--muted);
   font-size: 0.64rem;
   font-weight: 800;
@@ -69,7 +69,7 @@
 }
 
 .row + .row {
-  border-top: 1px solid rgba(87, 69, 47, 0.08);
+  border-top: 1px solid var(--border);
 }
 
 .row {
@@ -96,7 +96,7 @@
 }
 
 .previousSet {
-  color: var(--brand-deep);
+  color: var(--brand-strong);
   font-size: 0.72rem;
   font-weight: 600;
 }
@@ -115,7 +115,7 @@
   min-width: 0;
   border-radius: 8px;
   text-align: left;
-  background: color-mix(in srgb, var(--surface-strong) 88%, white 12%);
+  background: var(--surface-strong);
   color: var(--text);
 }
 
@@ -139,8 +139,8 @@
   width: 20px;
   height: 20px;
   border-radius: 6px;
-  border: 1px solid rgba(87, 69, 47, 0.18);
-  background: color-mix(in srgb, var(--surface-strong) 90%, white 10%);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
   transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
@@ -150,7 +150,7 @@
 }
 
 .checkboxInput:focus-visible + .checkboxBox {
-  outline: 2px solid rgba(214, 99, 58, 0.24);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 

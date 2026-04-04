@@ -1,16 +1,23 @@
 :root {
-  --bg: #f5efe4;
-  --bg-accent: #efe4d1;
-  --surface: rgba(255, 252, 248, 0.34);
-  --surface-strong: #fff9f0;
-  --text: #1f1b16;
-  --muted: #6f6558;
-  --line: rgba(71, 54, 35, 0.05);
-  --brand: #d6633a;
-  --brand-deep: #8f3d22;
-  --brand-soft: #f0b18f;
+  --bg: #f6f1e8;
+  --surface: #fffaf3;
+  --surface-strong: #fffdf8;
+  --text: #201a14;
+  --muted: #72685c;
+  --brand: #d26a3d;
+  --brand-strong: #8f4929;
+  --brand-contrast: #fffaf4;
   --success: #2f7d58;
-  --shadow: 0 6px 16px rgba(93, 56, 25, 0.04);
+  --border: rgba(32, 26, 20, 0.08);
+  --border-strong: rgba(32, 26, 20, 0.14);
+  --accent-soft: rgba(210, 106, 61, 0.1);
+  --accent-strong: rgba(210, 106, 61, 0.16);
+  --success-soft: rgba(47, 125, 88, 0.1);
+  --overlay: rgba(32, 26, 20, 0.18);
+  --backdrop: rgba(0, 0, 0, 0.48);
+  --shadow: 0 10px 24px rgba(32, 26, 20, 0.08);
+  --modal-shadow: 0 20px 40px rgba(32, 26, 20, 0.12);
+  --focus-ring: var(--accent-strong);
   --radius-lg: 20px;
   --radius-md: 16px;
   --radius-sm: 12px;
@@ -20,35 +27,70 @@
 
 html[data-theme="dark"],
 :root[data-theme="dark"] {
+  /* Theme override: dark */
   --bg: #15120f;
-  --bg-accent: #221b15;
-  --surface: rgba(40, 33, 27, 0.78);
+  --surface: #221c17;
   --surface-strong: #2a221c;
   --text: #f6efe6;
   --muted: #b9ac9b;
-  --line: rgba(255, 244, 232, 0.08);
   --brand: #ef7b52;
-  --brand-deep: #ffc1a9;
-  --brand-soft: #7c4e3a;
+  --brand-strong: #ffc1a9;
+  --brand-contrast: #1f1712;
   --success: #6dc293;
-  --shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  --border: rgba(246, 239, 230, 0.08);
+  --border-strong: rgba(246, 239, 230, 0.16);
+  --accent-soft: rgba(239, 123, 82, 0.2);
+  --accent-strong: rgba(239, 123, 82, 0.28);
+  --success-soft: rgba(109, 194, 147, 0.14);
+  --overlay: rgba(31, 27, 22, 0.32);
+  --backdrop: rgba(0, 0, 0, 0.48);
+  --shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
   color-scheme: dark;
+}
+
+html[data-theme="sage"],
+:root[data-theme="sage"] {
+  /* Theme override: sage */
+  --bg: #edf2eb;
+  --surface: #f7fbf5;
+  --surface-strong: #ffffff;
+  --text: #1c241f;
+  --muted: #677166;
+  --brand: #557a61;
+  --brand-strong: #35523f;
+  --brand-contrast: #f7fbf5;
+  --success: #557a61;
+  --border: rgba(28, 36, 31, 0.08);
+  --border-strong: rgba(28, 36, 31, 0.14);
+  --accent-soft: rgba(85, 122, 97, 0.1);
+  --accent-strong: rgba(85, 122, 97, 0.16);
+  --success-soft: rgba(85, 122, 97, 0.1);
+  --overlay: rgba(28, 36, 31, 0.16);
+  --backdrop: rgba(14, 18, 16, 0.42);
+  --shadow: 0 10px 24px rgba(28, 36, 31, 0.08);
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
+    /* Theme override: system dark */
     --bg: #15120f;
-    --bg-accent: #221b15;
-    --surface: rgba(40, 33, 27, 0.78);
+    --surface: #221c17;
     --surface-strong: #2a221c;
     --text: #f6efe6;
     --muted: #b9ac9b;
-    --line: rgba(255, 244, 232, 0.08);
     --brand: #ef7b52;
-    --brand-deep: #ffc1a9;
-    --brand-soft: #7c4e3a;
+    --brand-strong: #ffc1a9;
+    --brand-contrast: #1f1712;
     --success: #6dc293;
-    --shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    --border: rgba(246, 239, 230, 0.08);
+    --border-strong: rgba(246, 239, 230, 0.16);
+    --accent-soft: rgba(239, 123, 82, 0.2);
+    --accent-strong: rgba(239, 123, 82, 0.28);
+    --success-soft: rgba(109, 194, 147, 0.14);
+    --overlay: rgba(31, 27, 22, 0.32);
+    --backdrop: rgba(0, 0, 0, 0.48);
+    --shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
     color-scheme: dark;
   }
 }
@@ -77,8 +119,7 @@ body {
 }
 
 html[data-theme="dark"] body,
-:root[data-theme="dark"] body,
-body[data-theme="dark"] {
+:root[data-theme="dark"] body {
   background: var(--bg);
 }
 
@@ -147,8 +188,6 @@ a {
 }
 
 .panel,
-.stat-card,
-.workout-card,
 .exercise-row {
   border: 1px solid transparent;
   border-radius: var(--radius-lg);
@@ -164,9 +203,9 @@ a {
 .text-input {
   width: 100%;
   padding: 11px 12px;
-  border: 1px solid rgba(87, 69, 47, 0.08);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--surface-strong);
   color: var(--text);
 }
 
@@ -176,13 +215,12 @@ a {
 }
 
 .text-input:focus {
-  outline: 2px solid rgba(214, 99, 58, 0.24);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 .primary-button,
-.secondary-button,
-.tab-button {
+.secondary-button {
   transition: transform 180ms ease, background 180ms ease, color 180ms ease;
 }
 
@@ -190,7 +228,7 @@ a {
   padding: 12px 14px;
   border-radius: 10px;
   background: var(--brand);
-  color: #fffaf4;
+  color: var(--brand-contrast);
   font-weight: 700;
   box-shadow: none;
 }
@@ -198,19 +236,19 @@ a {
 .secondary-button {
   padding: 12px 14px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--surface-strong);
   color: var(--text);
   font-weight: 700;
+  border: 1px solid var(--border);
 }
 
 .modal-cancel-button {
   background: var(--brand);
-  color: #fffaf4;
+  color: var(--brand-contrast);
 }
 
 .primary-button:active,
-.secondary-button:active,
-.tab-button:active {
+.secondary-button:active {
   transform: scale(0.98);
 }
 
@@ -227,7 +265,7 @@ a {
 .or-divider::after {
   content: "";
   height: 1px;
-  background: var(--line);
+  background: var(--border);
 }
 
 .stack {
@@ -244,14 +282,12 @@ a {
 }
 
 .toolbar h2,
-.panel h3,
-.workout-card h3 {
+.panel h3 {
   margin: 0;
 }
 
 .toolbar p,
-.panel p,
-.workout-card p {
+.panel p {
   margin: 0;
 }
 
@@ -268,41 +304,17 @@ a {
   min-width: 42px;
   height: 42px;
   padding: 0 14px;
-  background: rgba(214, 99, 58, 0.14);
-  color: var(--brand-deep);
+  background: var(--accent-strong);
+  color: var(--brand-strong);
   font-weight: 800;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.stat-card {
-  padding: 16px;
-}
-
-.stat-label {
-  font-size: 0.88rem;
-  color: var(--muted);
-}
-
-.stat-value {
-  margin-top: 10px;
-  font-size: 1.7rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
 }
 
 .panel {
   padding: 16px;
-  background: rgba(255, 251, 247, 0.28);
+  background: var(--surface);
 }
 
 .panel-header,
-.workout-header,
-.exercise-meta,
 .split-row {
   display: flex;
   align-items: center;
@@ -316,29 +328,10 @@ a {
 
 .tag {
   padding: 8px 11px;
-  background: rgba(214, 99, 58, 0.07);
-  color: var(--brand-deep);
+  background: var(--accent-soft);
+  color: var(--brand-strong);
   font-size: 0.78rem;
   font-weight: 700;
-}
-
-.tab-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.tab-button {
-  padding: 12px 10px;
-  border-radius: 16px;
-  background: transparent;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.tab-button.active {
-  background: rgba(214, 99, 58, 0.12);
-  color: var(--brand-deep);
 }
 
 .input-grid {
@@ -347,19 +340,9 @@ a {
   gap: 10px;
 }
 
-.workout-card {
-  padding: 16px;
-}
-
-.workout-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .mini-pill {
   padding: 7px 10px;
-  background: rgba(47, 125, 88, 0.08);
+  background: var(--success-soft);
   color: var(--success);
   font-size: 0.75rem;
   font-weight: 700;
@@ -370,31 +353,16 @@ a {
   padding: 14px 16px;
 }
 
-.simple-frame {
-  width: min(100%, 560px);
-}
-
-.simple-screen {
-  gap: 16px;
-}
-
-.template-list,
-.exercise-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .danger-button {
-  color: var(--brand-deep);
-  background: rgba(214, 99, 58, 0.1);
+  color: var(--brand-strong);
+  background: var(--accent-soft);
 }
 
 .back-arrow {
   width: 26px;
   height: 26px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.58);
+  background: var(--surface);
   color: var(--text);
   font-size: 0.88rem;
   font-weight: 800;
@@ -438,7 +406,7 @@ a {
   align-items: center;
   justify-content: center;
   padding: 18px;
-  background: rgba(31, 27, 22, 0.22);
+  background: var(--backdrop);
   z-index: 1000;
 }
 
@@ -449,8 +417,8 @@ a {
   gap: 12px;
   padding: 16px;
   border-radius: 16px;
-  background: rgba(255, 250, 244, 0.98);
-  box-shadow: 0 20px 40px rgba(31, 27, 22, 0.12);
+  background: var(--surface-strong);
+  box-shadow: var(--modal-shadow);
 }
 
 .modal-header {
@@ -475,180 +443,12 @@ a {
   width: 100%;
 }
 
-.bottom-nav {
-  margin-top: auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 14px 16px 18px;
-  border-top: 1px solid rgba(99, 77, 50, 0.08);
-  background: rgba(255, 247, 237, 0.84);
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 8px;
-  border-radius: 18px;
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.nav-item.active {
-  background: rgba(214, 99, 58, 0.12);
-  color: var(--brand-deep);
-}
-
 .empty-state {
   padding: 16px;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.64);
+  background: var(--surface);
+  border: 1px solid var(--border);
   color: var(--muted);
-}
-
-html[data-theme="dark"] .panel,
-html[data-theme="dark"] .stat-card,
-html[data-theme="dark"] .workout-card,
-html[data-theme="dark"] .exercise-row,
-html[data-theme="dark"] .modal-card,
-html[data-theme="dark"] .empty-state,
-:root[data-theme="dark"] .panel,
-:root[data-theme="dark"] .stat-card,
-:root[data-theme="dark"] .workout-card,
-:root[data-theme="dark"] .exercise-row,
-:root[data-theme="dark"] .modal-card,
-:root[data-theme="dark"] .empty-state,
-body[data-theme="dark"] .panel,
-body[data-theme="dark"] .stat-card,
-body[data-theme="dark"] .workout-card,
-body[data-theme="dark"] .exercise-row,
-body[data-theme="dark"] .modal-card,
-body[data-theme="dark"] .empty-state {
-  border-color: rgba(255, 244, 232, 0.07);
-}
-
-html[data-theme="dark"] .panel,
-html[data-theme="dark"] .modal-card,
-html[data-theme="dark"] .empty-state,
-:root[data-theme="dark"] .panel,
-:root[data-theme="dark"] .modal-card,
-:root[data-theme="dark"] .empty-state,
-body[data-theme="dark"] .panel,
-body[data-theme="dark"] .modal-card,
-body[data-theme="dark"] .empty-state {
-  background: #221c17;
-}
-
-html[data-theme="dark"] .text-input,
-html[data-theme="dark"] .secondary-button,
-html[data-theme="dark"] .back-arrow,
-:root[data-theme="dark"] .text-input,
-:root[data-theme="dark"] .secondary-button,
-:root[data-theme="dark"] .back-arrow,
-body[data-theme="dark"] .text-input,
-body[data-theme="dark"] .secondary-button,
-body[data-theme="dark"] .back-arrow {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
-  border-color: rgba(255, 244, 232, 0.08);
-}
-
-html[data-theme="dark"] .text-input,
-:root[data-theme="dark"] .text-input,
-body[data-theme="dark"] .text-input {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-html[data-theme="dark"] .primary-button,
-:root[data-theme="dark"] .primary-button,
-body[data-theme="dark"] .primary-button {
-  color: #1f1712;
-}
-
-html[data-theme="dark"] .modal-cancel-button,
-:root[data-theme="dark"] .modal-cancel-button,
-body[data-theme="dark"] .modal-cancel-button {
-  background: var(--brand);
-  color: #fffaf4;
-  border-color: transparent;
-}
-
-html[data-theme="dark"] .tag,
-html[data-theme="dark"] .avatar-pill,
-html[data-theme="dark"] .mini-pill,
-html[data-theme="dark"] .nav-item.active,
-html[data-theme="dark"] .tab-button.active,
-:root[data-theme="dark"] .tag,
-:root[data-theme="dark"] .avatar-pill,
-:root[data-theme="dark"] .mini-pill,
-:root[data-theme="dark"] .nav-item.active,
-:root[data-theme="dark"] .tab-button.active,
-body[data-theme="dark"] .tag,
-body[data-theme="dark"] .avatar-pill,
-body[data-theme="dark"] .mini-pill,
-body[data-theme="dark"] .nav-item.active,
-body[data-theme="dark"] .tab-button.active {
-  background: rgba(239, 123, 82, 0.2);
-}
-
-html[data-theme="dark"] .modal-backdrop,
-:root[data-theme="dark"] .modal-backdrop,
-body[data-theme="dark"] .modal-backdrop {
-  background: rgba(0, 0, 0, 0.48);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .panel,
-  :root:not([data-theme]) .stat-card,
-  :root:not([data-theme]) .workout-card,
-  :root:not([data-theme]) .exercise-row,
-  :root:not([data-theme]) .modal-card,
-  :root:not([data-theme]) .empty-state {
-    border-color: rgba(255, 244, 232, 0.07);
-  }
-
-  :root:not([data-theme]) .panel,
-  :root:not([data-theme]) .modal-card,
-  :root:not([data-theme]) .empty-state {
-    background: #221c17;
-  }
-
-  :root:not([data-theme]) .text-input,
-  :root:not([data-theme]) .secondary-button,
-  :root:not([data-theme]) .back-arrow {
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text);
-    border-color: rgba(255, 244, 232, 0.08);
-  }
-
-  :root:not([data-theme]) .text-input {
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  :root:not([data-theme]) .primary-button {
-    color: #1f1712;
-  }
-
-  :root:not([data-theme]) .modal-cancel-button {
-    background: var(--brand);
-    color: #fffaf4;
-    border-color: transparent;
-  }
-
-  :root:not([data-theme]) .tag,
-  :root:not([data-theme]) .avatar-pill,
-  :root:not([data-theme]) .mini-pill,
-  :root:not([data-theme]) .nav-item.active,
-  :root:not([data-theme]) .tab-button.active {
-    background: rgba(239, 123, 82, 0.2);
-  }
-
-  :root:not([data-theme]) .modal-backdrop {
-    background: rgba(0, 0, 0, 0.48);
-  }
 }
 
 @media (min-width: 768px) {
@@ -666,9 +466,6 @@ body[data-theme="dark"] .modal-backdrop {
     padding: 28px;
   }
 
-  .bottom-nav {
-    display: none;
-  }
 }
 
 @media (max-width: 520px) {
@@ -684,10 +481,6 @@ body[data-theme="dark"] .modal-backdrop {
   .screen {
     gap: 12px;
     padding: 8px;
-  }
-
-  .panel-header {
-    margin-bottom: 6px;
   }
 
   .modal-actions {

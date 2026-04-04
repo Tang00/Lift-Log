@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import styles from "@/components/app-shell.module.css";
 import { AccountView } from "@/components/account/account-view";
 import { AuthScreen } from "@/components/auth/auth-screen";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -244,7 +245,7 @@ export function AppShell() {
       <main className="page-shell">
         <section className="mobile-frame">
           <div className="screen">
-            <div className="hero-card">
+            <div className="panel">
               <h1>Lift Log</h1>
             </div>
           </div>
@@ -268,8 +269,8 @@ export function AppShell() {
   if (isLoadingData) {
     return (
       <main className="page-shell">
-        <section className="mobile-frame simple-frame">
-          <div className="screen simple-screen">
+        <section className={`mobile-frame ${styles.frame}`}>
+          <div className={`screen ${styles.screen}`}>
             <SiteHeader
               accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
               onSelectAccount={() => {
@@ -294,8 +295,8 @@ export function AppShell() {
 
   return (
     <main className="page-shell">
-      <section className="mobile-frame simple-frame">
-        <div className="screen simple-screen">
+      <section className={`mobile-frame ${styles.frame}`}>
+        <div className={`screen ${styles.screen}`}>
           <SiteHeader
             accountInitial={(session.user.email?.[0] ?? "A").toUpperCase()}
             onSelectAccount={() => {

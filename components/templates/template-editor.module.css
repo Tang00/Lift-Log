@@ -82,32 +82,6 @@
   margin-top: 10px;
 }
 
-.scrollLayout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0;
-  align-items: stretch;
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.scrollArea {
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-}
-
-.scrollArea::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  background: transparent;
-}
-
 .scrollSnapItem {
 }
 
@@ -130,9 +104,5 @@
   .header {
     grid-template-columns: 36px minmax(0, 1fr);
     gap: 6px;
-  }
-
-  .scrollLayout {
-    gap: 0;
   }
 }

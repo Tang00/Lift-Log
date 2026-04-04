@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { SegmentedScrollNav } from "@/components/ui/segmented-scroll-nav";
+import { ActionGroup } from "@/components/ui/action-group";
+import { ScrollablePane } from "@/components/ui/scrollable-pane";
 import { useSegmentedScroll } from "@/hooks/use-segmented-scroll";
 import styles from "@/components/templates/template-editor.module.css";
 import { TemplateEditorExerciseCard } from "@/components/templates/template-editor-exercise-card";
@@ -178,12 +180,20 @@ export function TemplateEditor({
         </div>
       </div>
 
-      <div className={styles.scrollLayout}>
-        <div
-          className={styles.scrollArea}
-          ref={containerRef}
-          style={{ paddingBottom: `${scrollPaddingBottom}px` }}
-        >
+      <ScrollablePane
+        rail={
+          <SegmentedScrollNav
+            activeIndex={activeIndex}
+            count={draft.exercises.length}
+            isVisible={isScrollActive}
+            labels={draft.exercises.map((exercise) => exercise.name || "Exercise")}
+            onScrub={scrubToIndex}
+            onSelect={scrollToIndex}
+          />
+        }
+        scrollPaddingBottom={scrollPaddingBottom}
+        scrollRef={containerRef}
+      >
           <div className={`panel ${styles.panel}`}>
             <div className={styles.grid}>
               <label className={styles.field}>
@@ -231,34 +241,27 @@ export function TemplateEditor({
               </div>
             ))}
           </div>
-          <div className={`${styles.editorActions} ${styles.scrollFooter}`} ref={trailingRef}>
-            <button
-              className="secondary-button"
-              disabled={draft.exercises.length >= MAX_EXERCISES}
-              type="button"
-              onClick={addExercise}
-            >
-              Add exercise
-            </button>
+          <div className={styles.scrollFooter} ref={trailingRef}>
+            <ActionGroup className={styles.editorActions}>
+              <button
+                className="secondary-button"
+                disabled={draft.exercises.length >= MAX_EXERCISES}
+                type="button"
+                onClick={addExercise}
+              >
+                Add exercise
+              </button>
 
-            <button
-              className="primary-button"
-              type="button"
-              onClick={() => onSave(draft)}
-            >
-              Save template
-            </button>
+              <button
+                className="primary-button"
+                type="button"
+                onClick={() => onSave(draft)}
+              >
+                Save template
+              </button>
+            </ActionGroup>
           </div>
-        </div>
-        <SegmentedScrollNav
-          activeIndex={activeIndex}
-          count={draft.exercises.length}
-          isVisible={isScrollActive}
-          labels={draft.exercises.map((exercise) => exercise.name || "Exercise")}
-          onScrub={scrubToIndex}
-          onSelect={scrollToIndex}
-        />
-      </div>
+      </ScrollablePane>
 
     </div>
   );

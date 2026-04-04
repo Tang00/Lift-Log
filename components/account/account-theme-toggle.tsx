@@ -1,10 +1,11 @@
 "use client";
 
 import styles from "@/components/account/account-view.module.css";
+import type { ThemeMode } from "@/hooks/use-theme-mode";
 
 type AccountThemeToggleProps = {
-  onThemeChange: (value: "system" | "light" | "dark") => void;
-  themeMode: "system" | "light" | "dark";
+  onThemeChange: (value: ThemeMode) => void;
+  themeMode: ThemeMode;
 };
 
 export function AccountThemeToggle({
@@ -33,6 +34,13 @@ export function AccountThemeToggle({
         onClick={() => onThemeChange("dark")}
       >
         Dark
+      </button>
+      <button
+        className={`${styles.themeToggleButton} ${themeMode === "sage" ? styles.active : ""}`}
+        type="button"
+        onClick={() => onThemeChange("sage")}
+      >
+        Sage
       </button>
     </div>
   );
