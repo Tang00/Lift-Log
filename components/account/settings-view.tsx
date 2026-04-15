@@ -4,10 +4,10 @@ import { useState } from "react";
 
 import styles from "@/components/account/account-view.module.css";
 import { AccountThemeToggle } from "@/components/account/account-theme-toggle";
-import type { ThemeMode } from "@/hooks/ui/use-theme-mode";
 import { Panel } from "@/components/ui/panel";
 import { ScrollablePane } from "@/components/ui/navigation/scrollable-pane";
 import { ConfirmationModal } from "@/components/ui/overlays/confirmation-modal";
+import type { ThemeMode } from "@/utils/theme/theme-palettes";
 
 type SettingsViewProps = {
   accountInitial: string;

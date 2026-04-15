@@ -1,18 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-export type ThemeMode =
-  | "system"
-  | "light"
-  | "dark"
-  | "sage"
-  | "ocean"
-  | "stone"
-  | "ember"
-  | "midnight";
+import {
+  getPaletteForMode,
+  THEME_OPTIONS,
+  type ThemeMode,
+} from "@/utils/theme/theme-palettes";
 
 const STORAGE_KEY = "lift-log-theme";
+
+function isThemeMode(value: string | null): value is ThemeMode {
+  return THEME_OPTIONS.some((theme) => theme.mode === value);
+}
 
 export function useThemeMode() {
   const [themeMode, setThemeMode] = useState<ThemeMode>("system");
@@ -23,16 +22,7 @@ export function useThemeMode() {
     }
 
     const storedTheme = window.localStorage.getItem(STORAGE_KEY);
-    if (
-      storedTheme === "system" ||
-      storedTheme === "light" ||
-      storedTheme === "dark" ||
-      storedTheme === "sage" ||
-      storedTheme === "ocean" ||
-      storedTheme === "stone" ||
-      storedTheme === "ember" ||
-      storedTheme === "midnight"
-    ) {
+    if (isThemeMode(storedTheme)) {
       setThemeMode(storedTheme);
     }
   }, []);
@@ -43,15 +33,33 @@ export function useThemeMode() {
     }
 
     const root = document.documentElement;
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    if (themeMode === "system") {
-      root.removeAttribute("data-theme");
-      window.localStorage.removeItem(STORAGE_KEY);
-      return;
+    function applyTheme() {
+      const palette = getPaletteForMode(themeMode);
+      root.style.setProperty("--bg", palette.bg);
+      root.style.setProperty("--surface", palette.surface);
+      root.style.setProperty("--text", palette.text);
+      root.style.setProperty("--muted", palette.muted);
+      root.style.setProperty("--brand", palette.brand);
+      root.style.setProperty("--success", palette.success);
+      root.style.setProperty("--danger", palette.danger);
+      root.style.setProperty("--backdrop", palette.backdrop);
+      root.style.colorScheme = palette.colorScheme;
     }
 
-    root.setAttribute("data-theme", themeMode);
+    applyTheme();
+
+    if (themeMode === "system") {
+      window.localStorage.removeItem(STORAGE_KEY);
+      mediaQuery.addEventListener("change", applyTheme);
+      return () => {
+        mediaQuery.removeEventListener("change", applyTheme);
+      };
+    }
+
     window.localStorage.setItem(STORAGE_KEY, themeMode);
+    return undefined;
   }, [themeMode]);
 
   return {

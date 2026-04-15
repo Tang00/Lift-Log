@@ -1,7 +1,9 @@
 "use client";
 
 import styles from "@/components/account/account-view.module.css";
-import type { ThemeMode } from "@/hooks/ui/use-theme-mode";
+import type { CSSProperties } from "react";
+import type { ThemeMode } from "@/utils/theme/theme-palettes";
+import { getPaletteForMode, THEME_OPTIONS } from "@/utils/theme/theme-palettes";
 
 type AccountThemeToggleProps = {
   onThemeChange: (value: ThemeMode) => void;
@@ -12,21 +14,24 @@ export function AccountThemeToggle({
   onThemeChange,
   themeMode,
 }: AccountThemeToggleProps) {
-  const themes: Array<{
-    mode: ThemeMode;
-    label: string;
-  }> = [
-    { mode: "system", label: "System" },
-    { mode: "light", label: "Light" },
-    { mode: "dark", label: "Dark" },
-    { mode: "sage", label: "Sage" },
-    { mode: "ocean", label: "Ocean" },
-    { mode: "stone", label: "Stone" },
-    { mode: "ember", label: "Ember" },
-    { mode: "midnight", label: "Midnight" },
-  ];
-  const coreThemes = themes.filter((theme) => theme.mode === "system" || theme.mode === "light" || theme.mode === "dark");
-  const extraThemes = themes.filter((theme) => theme.mode !== "system" && theme.mode !== "light" && theme.mode !== "dark");
+  function getThemePreviewStyle(mode: ThemeMode): CSSProperties {
+    const palette = getPaletteForMode(mode);
+    return {
+      ["--theme-swatch-bg" as string]: palette.bg,
+      ["--theme-swatch-border" as string]:
+        palette.colorScheme === "dark" ? "rgba(255,255,255,0.16)" : "rgba(20,20,20,0.14)",
+      ["--theme-swatch-brand" as string]: palette.brand,
+      ["--theme-swatch-muted" as string]: palette.muted,
+      ["--theme-swatch-strong" as string]: palette.text,
+    } as CSSProperties;
+  }
+
+  const coreThemes = THEME_OPTIONS.filter(
+    (theme) => theme.mode === "system" || theme.mode === "light" || theme.mode === "dark",
+  );
+  const extraThemes = THEME_OPTIONS.filter(
+    (theme) => theme.mode !== "system" && theme.mode !== "light" && theme.mode !== "dark",
+  );
 
   return (
     <div className={styles.themeSections} role="group" aria-label="Theme">
@@ -34,17 +39,17 @@ export function AccountThemeToggle({
         {coreThemes.map((theme) => (
           <button
             key={theme.mode}
-            className={`${styles.themeListItem} ${styles[`themePreview${theme.mode[0].toUpperCase()}${theme.mode.slice(1)}`]} ${themeMode === theme.mode ? styles.active : ""}`}
+            className={`${styles.themeListItem} ${themeMode === theme.mode ? styles.active : ""}`}
             type="button"
             onClick={() => onThemeChange(theme.mode)}
           >
             <span className={styles.themeListLabel}>{theme.label}</span>
             {theme.mode !== "system" && theme.mode !== "light" && theme.mode !== "dark" ? (
-              <span className={styles.themeSwatches} aria-hidden="true">
+              <span className="theme-swatches" aria-hidden="true">
                 {Array.from({ length: 4 }, (_, index) => (
                   <span
                     key={`${theme.mode}-${index}`}
-                    className={styles.themeSwatch}
+                    className="theme-swatch"
                   />
                 ))}
               </span>
@@ -60,17 +65,18 @@ export function AccountThemeToggle({
             {extraThemes.map((theme) => (
               <button
                 key={theme.mode}
-                className={`${styles.themeListItem} ${styles[`themePreview${theme.mode[0].toUpperCase()}${theme.mode.slice(1)}`]} ${themeMode === theme.mode ? styles.active : ""}`}
+                className={`${styles.themeListItem} ${themeMode === theme.mode ? styles.active : ""}`}
+                style={getThemePreviewStyle(theme.mode)}
                 type="button"
                 onClick={() => onThemeChange(theme.mode)}
               >
                 <span className={styles.themeListLabel}>{theme.label}</span>
                 {theme.mode !== "system" && theme.mode !== "light" && theme.mode !== "dark" ? (
-                  <span className={styles.themeSwatches} aria-hidden="true">
+                  <span className="theme-swatches" aria-hidden="true">
                     {Array.from({ length: 4 }, (_, index) => (
                       <span
                         key={`${theme.mode}-${index}`}
-                        className={styles.themeSwatch}
+                        className="theme-swatch"
                       />
                     ))}
                   </span>
