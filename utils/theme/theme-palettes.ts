@@ -24,6 +24,7 @@ function hexToRgb(hex: string) {
       .split("")
       .map((char) => char + char)
       .join("");
+      
     return {
       b: Number.parseInt(expanded.slice(4, 6), 16),
       g: Number.parseInt(expanded.slice(2, 4), 16),
@@ -60,22 +61,6 @@ function toBackdrop(bg: string, colorScheme: "light" | "dark") {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function toPalette(theme: Theme): ThemePalette {
-  const colorScheme = getColorScheme(theme.bg);
-
-  return {
-    backdrop: toBackdrop(theme.bg, colorScheme),
-    bg: theme.bg,
-    brand: theme.main,
-    colorScheme,
-    danger: theme.error,
-    muted: theme.sub,
-    success: theme.caret,
-    surface: theme.subAlt,
-    text: theme.text,
-  };
-}
-
 function formatThemeLabel(name: string) {
   return name
     .split(/[_\s]+/g)
@@ -108,6 +93,22 @@ const STANDARD_THEME_PALETTES = {
     text: "#f4f4f2",
   },
 } satisfies Record<"light" | "dark", ThemePalette>;
+
+function toPalette(theme: Theme): ThemePalette {
+  const colorScheme = getColorScheme(theme.bg);
+
+  return {
+    backdrop: toBackdrop(theme.bg, colorScheme),
+    bg: theme.bg,
+    brand: theme.main,
+    colorScheme,
+    danger: theme.error,
+    muted: theme.sub,
+    success: theme.caret,
+    surface: theme.subAlt,
+    text: theme.text,
+  };
+}
 
 const IMPORTED_THEME_PALETTES = Object.fromEntries(
   ThemesList.map((theme) => [theme.name, toPalette(theme)]),
